@@ -1,0 +1,475 @@
+{
+  "services": [
+    {
+      "id": "apple_music",
+      "type": "app_store",
+      "cancel_url": null,
+      "steps": [
+        "Open Settings on your iPhone or iPad",
+        "Tap your name at the top",
+        "Tap Subscriptions",
+        "Select Apple Music",
+        "Tap Cancel Subscription"
+      ]
+    },
+    {
+      "id": "icloud",
+      "type": "app_store",
+      "cancel_url": null,
+      "steps": [
+        "Open Settings on your iPhone or iPad",
+        "Tap your name at the top",
+        "Tap Subscriptions",
+        "Select iCloud+",
+        "Tap Cancel Subscription or downgrade to free tier"
+      ]
+    },
+    {
+      "id": "apple_tv",
+      "type": "app_store",
+      "cancel_url": null,
+      "steps": [
+        "Open Settings on your iPhone or iPad",
+        "Tap your name at the top",
+        "Tap Subscriptions",
+        "Select Apple TV+",
+        "Tap Cancel Subscription"
+      ]
+    },
+    {
+      "id": "apple_arcade",
+      "type": "app_store",
+      "cancel_url": null,
+      "steps": [
+        "Open Settings on your iPhone or iPad",
+        "Tap your name at the top",
+        "Tap Subscriptions",
+        "Select Apple Arcade",
+        "Tap Cancel Subscription"
+      ]
+    },
+    {
+      "id": "apple_fitness",
+      "type": "app_store",
+      "cancel_url": null,
+      "steps": [
+        "Open Settings on your iPhone or iPad",
+        "Tap your name at the top",
+        "Tap Subscriptions",
+        "Select Fitness+",
+        "Tap Cancel Subscription"
+      ]
+    },
+    {
+      "id": "apple_news",
+      "type": "app_store",
+      "cancel_url": null,
+      "steps": [
+        "Open Settings on your iPhone or iPad",
+        "Tap your name at the top",
+        "Tap Subscriptions",
+        "Select Apple News+",
+        "Tap Cancel Subscription"
+      ]
+    },
+    {
+      "id": "apple_one",
+      "type": "app_store",
+      "cancel_url": null,
+      "steps": [
+        "Open Settings on your iPhone or iPad",
+        "Tap your name at the top",
+        "Tap Subscriptions",
+        "Select Apple One",
+        "Tap Cancel Subscription"
+      ]
+    },
+    {
+      "id": "netflix",
+      "type": "web",
+      "cancel_url": "https://www.netflix.com/cancelplan",
+      "steps": [
+        "Sign in to Netflix",
+        "Go to Account",
+        "Click Cancel Membership",
+        "Confirm cancellation"
+      ]
+    },
+    {
+      "id": "spotify",
+      "type": "web",
+      "cancel_url": "https://www.spotify.com/account/subscription/",
+      "steps": [
+        "Sign in to Spotify account page",
+        "Click Your plan",
+        "Click Change plan",
+        "Select Cancel Premium"
+      ]
+    },
+    {
+      "id": "disney_plus",
+      "type": "web",
+      "cancel_url": "https://www.disneyplus.com/account/subscription",
+      "steps": [
+        "Sign in to Disney+",
+        "Go to Account",
+        "Select your subscription",
+        "Click Cancel Subscription"
+      ]
+    },
+    {
+      "id": "hulu",
+      "type": "web",
+      "cancel_url": "https://secure.hulu.com/account",
+      "steps": [
+        "Sign in to Hulu",
+        "Go to Account",
+        "Click Cancel under subscription",
+        "Follow the cancellation steps"
+      ]
+    },
+    {
+      "id": "max",
+      "type": "web",
+      "cancel_url": "https://www.max.com/account",
+      "steps": [
+        "Sign in to Max",
+        "Go to Account",
+        "Select Subscription",
+        "Click Cancel Subscription"
+      ]
+    },
+    {
+      "id": "amazon_prime",
+      "type": "web",
+      "cancel_url": "https://www.amazon.com/gp/primecentral",
+      "steps": [
+        "Sign in to Amazon",
+        "Go to Account & Lists",
+        "Click Prime Membership",
+        "Click End Membership"
+      ]
+    },
+    {
+      "id": "youtube_premium",
+      "type": "web",
+      "cancel_url": "https://www.youtube.com/paid_memberships",
+      "steps": [
+        "Sign in to YouTube",
+        "Go to Paid memberships",
+        "Click Manage membership",
+        "Click Deactivate or Cancel"
+      ]
+    },
+    {
+      "id": "discord",
+      "type": "web",
+      "cancel_url": "https://discord.com/settings/subscriptions",
+      "steps": [
+        "Open Discord settings",
+        "Go to Subscriptions",
+        "Click Cancel on Nitro subscription",
+        "Confirm cancellation"
+      ]
+    },
+    {
+      "id": "openai",
+      "type": "web",
+      "cancel_url": "https://platform.openai.com/account/billing/overview",
+      "steps": [
+        "Sign in to OpenAI",
+        "Go to Settings > Billing",
+        "Click Cancel plan",
+        "Confirm cancellation"
+      ]
+    },
+    {
+      "id": "anthropic",
+      "type": "web",
+      "cancel_url": "https://console.anthropic.com/settings/billing",
+      "steps": [
+        "Sign in to Anthropic Console",
+        "Go to Settings > Billing",
+        "Click Manage subscription",
+        "Click Cancel subscription"
+      ]
+    },
+    {
+      "id": "adobe",
+      "type": "web",
+      "cancel_url": "https://account.adobe.com/plans",
+      "steps": [
+        "Sign in to Adobe account",
+        "Go to Plans",
+        "Click Manage plan",
+        "Click Cancel plan (early termination fees may apply)"
+      ]
+    },
+    {
+      "id": "figma",
+      "type": "web",
+      "cancel_url": "https://www.figma.com/settings",
+      "steps": [
+        "Sign in to Figma",
+        "Go to Settings",
+        "Click on your team/organization",
+        "Go to Billing and cancel"
+      ]
+    },
+    {
+      "id": "notion",
+      "type": "web",
+      "cancel_url": "https://www.notion.so/my-account",
+      "steps": [
+        "Sign in to Notion",
+        "Go to Settings & members",
+        "Click Plans",
+        "Click Downgrade to free"
+      ]
+    },
+    {
+      "id": "dropbox",
+      "type": "web",
+      "cancel_url": "https://www.dropbox.com/account/plan",
+      "steps": [
+        "Sign in to Dropbox",
+        "Go to Account settings",
+        "Click Plan",
+        "Click Cancel plan"
+      ]
+    },
+    {
+      "id": "google_one",
+      "type": "web",
+      "cancel_url": "https://one.google.com/settings/plan",
+      "steps": [
+        "Sign in to Google One",
+        "Go to Settings",
+        "Click Cancel membership",
+        "Confirm cancellation"
+      ]
+    },
+    {
+      "id": "microsoft_365",
+      "type": "web",
+      "cancel_url": "https://account.microsoft.com/services/",
+      "steps": [
+        "Sign in to Microsoft account",
+        "Go to Services & subscriptions",
+        "Find Microsoft 365",
+        "Click Manage > Cancel"
+      ]
+    },
+    {
+      "id": "1password",
+      "type": "web",
+      "cancel_url": "https://my.1password.com/settings/billing",
+      "steps": [
+        "Sign in to 1Password.com",
+        "Go to Billing",
+        "Click Cancel subscription",
+        "Confirm cancellation"
+      ]
+    },
+    {
+      "id": "nordvpn",
+      "type": "web",
+      "cancel_url": "https://my.nordaccount.com/dashboard/",
+      "steps": [
+        "Sign in to Nord Account",
+        "Go to Dashboard",
+        "Click on your subscription",
+        "Click Cancel automatic renewal"
+      ]
+    },
+    {
+      "id": "expressvpn",
+      "type": "web",
+      "cancel_url": "https://www.expressvpn.com/subscriptions",
+      "steps": [
+        "Sign in to ExpressVPN account",
+        "Go to Subscriptions",
+        "Click Manage settings",
+        "Turn off auto-renewal"
+      ]
+    },
+    {
+      "id": "slack",
+      "type": "web",
+      "cancel_url": "https://slack.com/help/articles/218915077-Downgrade-your-workspace",
+      "steps": [
+        "Contact your Slack workspace admin",
+        "Admin goes to Settings & administration",
+        "Click Billing",
+        "Click Cancel subscription"
+      ]
+    },
+    {
+      "id": "linkedin",
+      "type": "web",
+      "cancel_url": "https://www.linkedin.com/mypreferences/d/categories/subscriptions",
+      "steps": [
+        "Sign in to LinkedIn",
+        "Click on your profile icon",
+        "Go to Settings & Privacy",
+        "Click Subscriptions and payments",
+        "Click Manage Premium account",
+        "Click Cancel subscription"
+      ]
+    },
+    {
+      "id": "medium",
+      "type": "web",
+      "cancel_url": "https://medium.com/me/settings/membership",
+      "steps": [
+        "Sign in to Medium",
+        "Go to Settings",
+        "Click Membership",
+        "Click Cancel membership"
+      ]
+    },
+    {
+      "id": "peacock",
+      "type": "web",
+      "cancel_url": "https://www.peacocktv.com/account/subscription",
+      "steps": [
+        "Sign in to Peacock",
+        "Go to Account",
+        "Click Subscription",
+        "Click Cancel Plan"
+      ]
+    },
+    {
+      "id": "paramount_plus",
+      "type": "web",
+      "cancel_url": "https://www.paramountplus.com/account/",
+      "steps": [
+        "Sign in to Paramount+",
+        "Go to Account",
+        "Click Cancel Subscription",
+        "Confirm cancellation"
+      ]
+    },
+    {
+      "id": "crunchyroll",
+      "type": "web",
+      "cancel_url": "https://www.crunchyroll.com/account/subscription",
+      "steps": [
+        "Sign in to Crunchyroll",
+        "Go to Account Settings",
+        "Click Subscription",
+        "Click Cancel Membership"
+      ]
+    },
+    {
+      "id": "github",
+      "type": "web",
+      "cancel_url": "https://github.com/settings/billing/plans",
+      "steps": [
+        "Sign in to GitHub",
+        "Go to Settings > Billing and plans",
+        "Click Plans",
+        "Click Cancel plan"
+      ]
+    },
+    {
+      "id": "zoom",
+      "type": "web",
+      "cancel_url": "https://zoom.us/account/billing",
+      "steps": [
+        "Sign in to Zoom",
+        "Go to Admin > Billing",
+        "Click Cancel Subscription",
+        "Follow cancellation steps"
+      ]
+    },
+    {
+      "id": "headspace",
+      "type": "web",
+      "cancel_url": "https://www.headspace.com/settings/subscription",
+      "steps": [
+        "Sign in to Headspace",
+        "Go to Settings",
+        "Click Subscription",
+        "Click Cancel subscription"
+      ]
+    },
+    {
+      "id": "calm",
+      "type": "web",
+      "cancel_url": "https://www.calm.com/account",
+      "steps": [
+        "Sign in to Calm",
+        "Go to Account",
+        "Click Manage Subscription",
+        "Click Cancel subscription"
+      ]
+    },
+    {
+      "id": "duolingo",
+      "type": "web",
+      "cancel_url": "https://www.duolingo.com/settings/subscription",
+      "steps": [
+        "Sign in to Duolingo",
+        "Go to Settings",
+        "Click Subscription",
+        "Click Cancel subscription"
+      ]
+    },
+    {
+      "id": "grammarly",
+      "type": "web",
+      "cancel_url": "https://account.grammarly.com/subscription",
+      "steps": [
+        "Sign in to Grammarly",
+        "Go to Account",
+        "Click Subscription",
+        "Click Cancel subscription"
+      ]
+    },
+    {
+      "id": "canva",
+      "type": "web",
+      "cancel_url": "https://www.canva.com/settings/billing",
+      "steps": [
+        "Sign in to Canva",
+        "Go to Account settings",
+        "Click Billing & teams",
+        "Click Cancel subscription"
+      ]
+    },
+    {
+      "id": "evernote",
+      "type": "web",
+      "cancel_url": "https://www.evernote.com/Settings.action",
+      "steps": [
+        "Sign in to Evernote web",
+        "Go to Settings",
+        "Click Manage subscription",
+        "Click Cancel or downgrade"
+      ]
+    },
+    {
+      "id": "setapp",
+      "type": "web",
+      "cancel_url": "https://my.setapp.com/subscription",
+      "steps": [
+        "Sign in to Setapp account",
+        "Go to Subscription",
+        "Click Cancel subscription",
+        "Confirm cancellation"
+      ]
+    },
+    {
+      "id": "midjourney",
+      "type": "web",
+      "cancel_url": "https://www.midjourney.com/account/",
+      "steps": [
+        "Sign in to Midjourney",
+        "Go to your account page",
+        "Click Manage subscription",
+        "Click Cancel plan"
+      ]
+    }
+  ]
+}

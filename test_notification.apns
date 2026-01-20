@@ -1,0 +1,10 @@
+{
+  "Simulator Target Bundle": "com.mukeshkhatri.subscriptionManager",
+  "aps": {
+    "alert": {
+      "title": "Subscription Renewal",
+      "body": "Your OpenAI subscription ($20.00/mo) renews tomorrow."
+    },
+    "sound": "default"
+  }
+}

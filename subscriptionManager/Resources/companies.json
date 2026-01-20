@@ -1,0 +1,830 @@
+[
+  {
+    "id": "netflix",
+    "name": "Netflix",
+    "aliases": ["Netflix Inc"],
+    "domains": ["netflix.com"],
+    "category": "streaming",
+    "brandColor": "#E50914",
+    "logoAssetName": "NetflixLogo"
+  },
+  {
+    "id": "spotify",
+    "name": "Spotify",
+    "aliases": ["Spotify AB", "Spotify Premium"],
+    "domains": ["spotify.com"],
+    "category": "music",
+    "brandColor": "#1DB954",
+    "logoAssetName": "SpotifyLogo"
+  },
+  {
+    "id": "apple_music",
+    "name": "Apple Music",
+    "aliases": ["Apple Music Subscription", "iTunes Music"],
+    "domains": ["apple.com", "music.apple.com"],
+    "category": "music",
+    "brandColor": "#FC3C44",
+    "logoAssetName": "AppleMusicLogo"
+  },
+  {
+    "id": "apple_tv",
+    "name": "Apple TV+",
+    "aliases": ["Apple TV Plus", "AppleTV"],
+    "domains": ["tv.apple.com"],
+    "category": "streaming",
+    "brandColor": "#000000",
+    "logoAssetName": "AppleTVLogo"
+  },
+  {
+    "id": "apple_one",
+    "name": "Apple One",
+    "aliases": ["Apple One Bundle"],
+    "domains": ["apple.com"],
+    "category": "other",
+    "brandColor": "#000000",
+    "logoAssetName": "AppleOneLogo"
+  },
+  {
+    "id": "apple_icloud",
+    "name": "iCloud+",
+    "aliases": ["iCloud", "iCloud Storage", "Apple iCloud"],
+    "domains": ["icloud.com"],
+    "category": "cloud",
+    "brandColor": "#3693F3",
+    "logoAssetName": "iCloudLogo"
+  },
+  {
+    "id": "disney_plus",
+    "name": "Disney+",
+    "aliases": ["Disney Plus", "DisneyPlus", "Disney+ Subscription"],
+    "domains": ["disneyplus.com", "disney.com"],
+    "category": "streaming",
+    "brandColor": "#113CCF",
+    "logoAssetName": "DisneyPlusLogo"
+  },
+  {
+    "id": "hbo_max",
+    "name": "Max",
+    "aliases": ["HBO Max", "HBO", "Warner Bros Max"],
+    "domains": ["max.com", "hbomax.com"],
+    "category": "streaming",
+    "brandColor": "#002BE7",
+    "logoAssetName": "MaxLogo"
+  },
+  {
+    "id": "hulu",
+    "name": "Hulu",
+    "aliases": ["Hulu LLC", "Hulu + Live TV"],
+    "domains": ["hulu.com"],
+    "category": "streaming",
+    "brandColor": "#1CE783",
+    "logoAssetName": "HuluLogo"
+  },
+  {
+    "id": "amazon_prime",
+    "name": "Amazon Prime",
+    "aliases": ["Prime Video", "Amazon Prime Video", "Prime Membership"],
+    "domains": ["amazon.com", "primevideo.com"],
+    "category": "streaming",
+    "brandColor": "#00A8E1",
+    "logoAssetName": "AmazonPrimeLogo"
+  },
+  {
+    "id": "youtube_premium",
+    "name": "YouTube Premium",
+    "aliases": ["YouTube Music", "YouTube TV", "YouTube Red"],
+    "domains": ["youtube.com", "music.youtube.com"],
+    "category": "streaming",
+    "brandColor": "#FF0000",
+    "logoAssetName": "YouTubeLogo"
+  },
+  {
+    "id": "paramount_plus",
+    "name": "Paramount+",
+    "aliases": ["Paramount Plus", "CBS All Access"],
+    "domains": ["paramountplus.com"],
+    "category": "streaming",
+    "brandColor": "#0064FF",
+    "logoAssetName": "ParamountPlusLogo"
+  },
+  {
+    "id": "peacock",
+    "name": "Peacock",
+    "aliases": ["Peacock TV", "NBCUniversal Peacock"],
+    "domains": ["peacocktv.com"],
+    "category": "streaming",
+    "brandColor": "#000000",
+    "logoAssetName": "PeacockLogo"
+  },
+  {
+    "id": "crunchyroll",
+    "name": "Crunchyroll",
+    "aliases": ["Crunchyroll Premium"],
+    "domains": ["crunchyroll.com"],
+    "category": "streaming",
+    "brandColor": "#F47521",
+    "logoAssetName": "CrunchyrollLogo"
+  },
+  {
+    "id": "tidal",
+    "name": "TIDAL",
+    "aliases": ["Tidal Music", "Tidal HiFi"],
+    "domains": ["tidal.com"],
+    "category": "music",
+    "brandColor": "#000000",
+    "logoAssetName": "TidalLogo"
+  },
+  {
+    "id": "deezer",
+    "name": "Deezer",
+    "aliases": ["Deezer Premium"],
+    "domains": ["deezer.com"],
+    "category": "music",
+    "brandColor": "#FEAA2D",
+    "logoAssetName": "DeezerLogo"
+  },
+  {
+    "id": "soundcloud",
+    "name": "SoundCloud",
+    "aliases": ["SoundCloud Go", "SoundCloud Go+"],
+    "domains": ["soundcloud.com"],
+    "category": "music",
+    "brandColor": "#FF5500",
+    "logoAssetName": "SoundCloudLogo"
+  },
+  {
+    "id": "pandora",
+    "name": "Pandora",
+    "aliases": ["Pandora Music", "Pandora Premium", "Pandora Plus"],
+    "domains": ["pandora.com"],
+    "category": "music",
+    "brandColor": "#3668FF",
+    "logoAssetName": "PandoraLogo"
+  },
+  {
+    "id": "adobe_cc",
+    "name": "Adobe Creative Cloud",
+    "aliases": ["Adobe CC", "Adobe Subscription", "Adobe All Apps", "Adobe Photoshop", "Adobe Illustrator", "Adobe Premiere"],
+    "domains": ["adobe.com", "creativecloud.adobe.com"],
+    "category": "productivity",
+    "brandColor": "#FF0000",
+    "logoAssetName": "AdobeLogo"
+  },
+  {
+    "id": "microsoft_365",
+    "name": "Microsoft 365",
+    "aliases": ["Office 365", "Microsoft Office", "M365"],
+    "domains": ["microsoft.com", "office.com"],
+    "category": "productivity",
+    "brandColor": "#0078D4",
+    "logoAssetName": "Microsoft365Logo"
+  },
+  {
+    "id": "google_one",
+    "name": "Google One",
+    "aliases": ["Google Storage", "Google Drive Storage"],
+    "domains": ["one.google.com", "google.com"],
+    "category": "cloud",
+    "brandColor": "#4285F4",
+    "logoAssetName": "GoogleOneLogo"
+  },
+  {
+    "id": "google_workspace",
+    "name": "Google Workspace",
+    "aliases": ["G Suite", "Google Apps"],
+    "domains": ["workspace.google.com"],
+    "category": "productivity",
+    "brandColor": "#4285F4",
+    "logoAssetName": "GoogleWorkspaceLogo"
+  },
+  {
+    "id": "dropbox",
+    "name": "Dropbox",
+    "aliases": ["Dropbox Plus", "Dropbox Professional"],
+    "domains": ["dropbox.com"],
+    "category": "cloud",
+    "brandColor": "#0061FF",
+    "logoAssetName": "DropboxLogo"
+  },
+  {
+    "id": "notion",
+    "name": "Notion",
+    "aliases": ["Notion Plus", "Notion Team"],
+    "domains": ["notion.so", "notion.com"],
+    "category": "productivity",
+    "brandColor": "#000000",
+    "logoAssetName": "NotionLogo"
+  },
+  {
+    "id": "slack",
+    "name": "Slack",
+    "aliases": ["Slack Pro", "Slack Business"],
+    "domains": ["slack.com"],
+    "category": "productivity",
+    "brandColor": "#4A154B",
+    "logoAssetName": "SlackLogo"
+  },
+  {
+    "id": "figma",
+    "name": "Figma",
+    "aliases": ["Figma Professional", "Figma Organization"],
+    "domains": ["figma.com"],
+    "category": "productivity",
+    "brandColor": "#F24E1E",
+    "logoAssetName": "FigmaLogo"
+  },
+  {
+    "id": "canva",
+    "name": "Canva",
+    "aliases": ["Canva Pro", "Canva for Teams"],
+    "domains": ["canva.com"],
+    "category": "productivity",
+    "brandColor": "#00C4CC",
+    "logoAssetName": "CanvaLogo"
+  },
+  {
+    "id": "grammarly",
+    "name": "Grammarly",
+    "aliases": ["Grammarly Premium", "Grammarly Business"],
+    "domains": ["grammarly.com"],
+    "category": "productivity",
+    "brandColor": "#15C39A",
+    "logoAssetName": "GrammarlyLogo"
+  },
+  {
+    "id": "1password",
+    "name": "1Password",
+    "aliases": ["1Password Families", "1Password Teams"],
+    "domains": ["1password.com"],
+    "category": "vpn",
+    "brandColor": "#0094F5",
+    "logoAssetName": "1PasswordLogo"
+  },
+  {
+    "id": "lastpass",
+    "name": "LastPass",
+    "aliases": ["LastPass Premium", "LastPass Families"],
+    "domains": ["lastpass.com"],
+    "category": "vpn",
+    "brandColor": "#D32D27",
+    "logoAssetName": "LastPassLogo"
+  },
+  {
+    "id": "bitwarden",
+    "name": "Bitwarden",
+    "aliases": ["Bitwarden Premium"],
+    "domains": ["bitwarden.com"],
+    "category": "vpn",
+    "brandColor": "#175DDC",
+    "logoAssetName": "BitwardenLogo"
+  },
+  {
+    "id": "nordvpn",
+    "name": "NordVPN",
+    "aliases": ["Nord VPN", "Nord Security"],
+    "domains": ["nordvpn.com"],
+    "category": "vpn",
+    "brandColor": "#4687FF",
+    "logoAssetName": "NordVPNLogo"
+  },
+  {
+    "id": "expressvpn",
+    "name": "ExpressVPN",
+    "aliases": ["Express VPN"],
+    "domains": ["expressvpn.com"],
+    "category": "vpn",
+    "brandColor": "#DA3940",
+    "logoAssetName": "ExpressVPNLogo"
+  },
+  {
+    "id": "surfshark",
+    "name": "Surfshark",
+    "aliases": ["Surfshark VPN"],
+    "domains": ["surfshark.com"],
+    "category": "vpn",
+    "brandColor": "#178DE9",
+    "logoAssetName": "SurfsharkLogo"
+  },
+  {
+    "id": "chatgpt",
+    "name": "ChatGPT",
+    "aliases": ["ChatGPT Plus", "OpenAI ChatGPT", "GPT Plus"],
+    "domains": ["openai.com", "chat.openai.com"],
+    "category": "ai",
+    "brandColor": "#10A37F",
+    "logoAssetName": "OpenAILogo"
+  },
+  {
+    "id": "claude",
+    "name": "Claude",
+    "aliases": ["Claude Pro", "Anthropic Claude", "Claude AI"],
+    "domains": ["anthropic.com", "claude.ai"],
+    "category": "ai",
+    "brandColor": "#D97757",
+    "logoAssetName": "ClaudeLogo"
+  },
+  {
+    "id": "midjourney",
+    "name": "Midjourney",
+    "aliases": ["MidJourney AI"],
+    "domains": ["midjourney.com"],
+    "category": "ai",
+    "brandColor": "#000000",
+    "logoAssetName": "MidjourneyLogo"
+  },
+  {
+    "id": "github",
+    "name": "GitHub",
+    "aliases": ["GitHub Pro", "GitHub Copilot", "GitHub Team"],
+    "domains": ["github.com"],
+    "category": "productivity",
+    "brandColor": "#181717",
+    "logoAssetName": "GitHubLogo"
+  },
+  {
+    "id": "gitlab",
+    "name": "GitLab",
+    "aliases": ["GitLab Premium", "GitLab Ultimate"],
+    "domains": ["gitlab.com"],
+    "category": "productivity",
+    "brandColor": "#FC6D26",
+    "logoAssetName": "GitLabLogo"
+  },
+  {
+    "id": "xbox_game_pass",
+    "name": "Xbox Game Pass",
+    "aliases": ["Game Pass", "Xbox Game Pass Ultimate", "PC Game Pass"],
+    "domains": ["xbox.com", "microsoft.com"],
+    "category": "gaming",
+    "brandColor": "#107C10",
+    "logoAssetName": "XboxLogo"
+  },
+  {
+    "id": "playstation_plus",
+    "name": "PlayStation Plus",
+    "aliases": ["PS Plus", "PSN Plus", "PlayStation Now"],
+    "domains": ["playstation.com"],
+    "category": "gaming",
+    "brandColor": "#003791",
+    "logoAssetName": "PlayStationLogo"
+  },
+  {
+    "id": "nintendo_online",
+    "name": "Nintendo Switch Online",
+    "aliases": ["Nintendo Online", "NSO"],
+    "domains": ["nintendo.com"],
+    "category": "gaming",
+    "brandColor": "#E60012",
+    "logoAssetName": "NintendoLogo"
+  },
+  {
+    "id": "ea_play",
+    "name": "EA Play",
+    "aliases": ["EA Access", "EA Play Pro"],
+    "domains": ["ea.com"],
+    "category": "gaming",
+    "brandColor": "#000000",
+    "logoAssetName": "EALogo"
+  },
+  {
+    "id": "twitch",
+    "name": "Twitch",
+    "aliases": ["Twitch Turbo", "Twitch Prime"],
+    "domains": ["twitch.tv"],
+    "category": "gaming",
+    "brandColor": "#9146FF",
+    "logoAssetName": "TwitchLogo"
+  },
+  {
+    "id": "discord",
+    "name": "Discord",
+    "aliases": ["Discord Nitro", "Nitro"],
+    "domains": ["discord.com", "discordapp.com"],
+    "category": "social",
+    "brandColor": "#5865F2",
+    "logoAssetName": "DiscordLogo"
+  },
+  {
+    "id": "linkedin",
+    "name": "LinkedIn",
+    "aliases": ["LinkedIn Premium", "LinkedIn Learning", "LinkedIn Sales Navigator"],
+    "domains": ["linkedin.com"],
+    "category": "social",
+    "brandColor": "#0A66C2",
+    "logoAssetName": "LinkedInLogo"
+  },
+  {
+    "id": "twitter",
+    "name": "X",
+    "aliases": ["Twitter", "X Premium", "Twitter Blue"],
+    "domains": ["x.com", "twitter.com"],
+    "category": "social",
+    "brandColor": "#000000",
+    "logoAssetName": "XLogo"
+  },
+  {
+    "id": "strava",
+    "name": "Strava",
+    "aliases": ["Strava Premium", "Strava Summit"],
+    "domains": ["strava.com"],
+    "category": "fitness",
+    "brandColor": "#FC4C02",
+    "logoAssetName": "StravaLogo"
+  },
+  {
+    "id": "peloton",
+    "name": "Peloton",
+    "aliases": ["Peloton Digital", "Peloton App"],
+    "domains": ["onepeloton.com", "peloton.com"],
+    "category": "fitness",
+    "brandColor": "#000000",
+    "logoAssetName": "PelotonLogo"
+  },
+  {
+    "id": "fitbit",
+    "name": "Fitbit",
+    "aliases": ["Fitbit Premium"],
+    "domains": ["fitbit.com"],
+    "category": "fitness",
+    "brandColor": "#00B0B9",
+    "logoAssetName": "FitbitLogo"
+  },
+  {
+    "id": "myfitnesspal",
+    "name": "MyFitnessPal",
+    "aliases": ["MyFitnessPal Premium", "MFP"],
+    "domains": ["myfitnesspal.com"],
+    "category": "fitness",
+    "brandColor": "#0069D1",
+    "logoAssetName": "MyFitnessPalLogo"
+  },
+  {
+    "id": "headspace",
+    "name": "Headspace",
+    "aliases": ["Headspace Plus"],
+    "domains": ["headspace.com"],
+    "category": "fitness",
+    "brandColor": "#F47D31",
+    "logoAssetName": "HeadspaceLogo"
+  },
+  {
+    "id": "calm",
+    "name": "Calm",
+    "aliases": ["Calm Premium", "Calm App"],
+    "domains": ["calm.com"],
+    "category": "fitness",
+    "brandColor": "#7FDBFF",
+    "logoAssetName": "CalmLogo"
+  },
+  {
+    "id": "nytimes",
+    "name": "The New York Times",
+    "aliases": ["NYTimes", "NY Times", "New York Times Digital"],
+    "domains": ["nytimes.com"],
+    "category": "news",
+    "brandColor": "#000000",
+    "logoAssetName": "NYTimesLogo"
+  },
+  {
+    "id": "wsj",
+    "name": "The Wall Street Journal",
+    "aliases": ["WSJ", "Wall Street Journal"],
+    "domains": ["wsj.com"],
+    "category": "news",
+    "brandColor": "#0080C3",
+    "logoAssetName": "WSJLogo"
+  },
+  {
+    "id": "washington_post",
+    "name": "The Washington Post",
+    "aliases": ["Washington Post", "WaPo"],
+    "domains": ["washingtonpost.com"],
+    "category": "news",
+    "brandColor": "#000000",
+    "logoAssetName": "WashingtonPostLogo"
+  },
+  {
+    "id": "economist",
+    "name": "The Economist",
+    "aliases": ["Economist Digital"],
+    "domains": ["economist.com"],
+    "category": "news",
+    "brandColor": "#E3120B",
+    "logoAssetName": "EconomistLogo"
+  },
+  {
+    "id": "medium",
+    "name": "Medium",
+    "aliases": ["Medium Membership"],
+    "domains": ["medium.com"],
+    "category": "news",
+    "brandColor": "#000000",
+    "logoAssetName": "MediumLogo"
+  },
+  {
+    "id": "substack",
+    "name": "Substack",
+    "aliases": ["Substack Subscription"],
+    "domains": ["substack.com"],
+    "category": "news",
+    "brandColor": "#FF6719",
+    "logoAssetName": "SubstackLogo"
+  },
+  {
+    "id": "audible",
+    "name": "Audible",
+    "aliases": ["Audible Premium", "Amazon Audible"],
+    "domains": ["audible.com"],
+    "category": "education",
+    "brandColor": "#F8991D",
+    "logoAssetName": "AudibleLogo"
+  },
+  {
+    "id": "kindle_unlimited",
+    "name": "Kindle Unlimited",
+    "aliases": ["Kindle", "Amazon Kindle"],
+    "domains": ["amazon.com"],
+    "category": "education",
+    "brandColor": "#FF9900",
+    "logoAssetName": "KindleLogo"
+  },
+  {
+    "id": "masterclass",
+    "name": "MasterClass",
+    "aliases": ["Master Class"],
+    "domains": ["masterclass.com"],
+    "category": "education",
+    "brandColor": "#000000",
+    "logoAssetName": "MasterClassLogo"
+  },
+  {
+    "id": "skillshare",
+    "name": "Skillshare",
+    "aliases": ["Skillshare Premium"],
+    "domains": ["skillshare.com"],
+    "category": "education",
+    "brandColor": "#00FF84",
+    "logoAssetName": "SkillshareLogo"
+  },
+  {
+    "id": "coursera",
+    "name": "Coursera",
+    "aliases": ["Coursera Plus"],
+    "domains": ["coursera.org"],
+    "category": "education",
+    "brandColor": "#0056D2",
+    "logoAssetName": "CourseraLogo"
+  },
+  {
+    "id": "duolingo",
+    "name": "Duolingo",
+    "aliases": ["Duolingo Plus", "Duolingo Super"],
+    "domains": ["duolingo.com"],
+    "category": "education",
+    "brandColor": "#58CC02",
+    "logoAssetName": "DuolingoLogo"
+  },
+  {
+    "id": "doordash",
+    "name": "DoorDash",
+    "aliases": ["DashPass", "DoorDash DashPass"],
+    "domains": ["doordash.com"],
+    "category": "food",
+    "brandColor": "#FF3008",
+    "logoAssetName": "DoorDashLogo"
+  },
+  {
+    "id": "uber_eats",
+    "name": "Uber Eats",
+    "aliases": ["Uber One", "Uber Eats Pass"],
+    "domains": ["ubereats.com", "uber.com"],
+    "category": "food",
+    "brandColor": "#06C167",
+    "logoAssetName": "UberEatsLogo"
+  },
+  {
+    "id": "grubhub",
+    "name": "Grubhub",
+    "aliases": ["Grubhub+"],
+    "domains": ["grubhub.com"],
+    "category": "food",
+    "brandColor": "#F63440",
+    "logoAssetName": "GrubhubLogo"
+  },
+  {
+    "id": "instacart",
+    "name": "Instacart",
+    "aliases": ["Instacart+", "Instacart Express"],
+    "domains": ["instacart.com"],
+    "category": "food",
+    "brandColor": "#43B02A",
+    "logoAssetName": "InstacartLogo"
+  },
+  {
+    "id": "walmart_plus",
+    "name": "Walmart+",
+    "aliases": ["Walmart Plus"],
+    "domains": ["walmart.com"],
+    "category": "shopping",
+    "brandColor": "#0071DC",
+    "logoAssetName": "WalmartLogo"
+  },
+  {
+    "id": "costco",
+    "name": "Costco",
+    "aliases": ["Costco Membership", "Costco Executive"],
+    "domains": ["costco.com"],
+    "category": "shopping",
+    "brandColor": "#E31837",
+    "logoAssetName": "CostcoLogo"
+  },
+  {
+    "id": "amazon_prime_membership",
+    "name": "Amazon Prime",
+    "aliases": ["Prime Membership", "Amazon Prime Subscription"],
+    "domains": ["amazon.com"],
+    "category": "shopping",
+    "brandColor": "#FF9900",
+    "logoAssetName": "AmazonLogo"
+  },
+  {
+    "id": "zoom",
+    "name": "Zoom",
+    "aliases": ["Zoom Pro", "Zoom Business"],
+    "domains": ["zoom.us", "zoom.com"],
+    "category": "productivity",
+    "brandColor": "#2D8CFF",
+    "logoAssetName": "ZoomLogo"
+  },
+  {
+    "id": "evernote",
+    "name": "Evernote",
+    "aliases": ["Evernote Premium", "Evernote Personal"],
+    "domains": ["evernote.com"],
+    "category": "productivity",
+    "brandColor": "#00A82D",
+    "logoAssetName": "EvernoteLogo"
+  },
+  {
+    "id": "todoist",
+    "name": "Todoist",
+    "aliases": ["Todoist Pro", "Todoist Business"],
+    "domains": ["todoist.com"],
+    "category": "productivity",
+    "brandColor": "#E44332",
+    "logoAssetName": "TodoistLogo"
+  },
+  {
+    "id": "asana",
+    "name": "Asana",
+    "aliases": ["Asana Premium", "Asana Business"],
+    "domains": ["asana.com"],
+    "category": "productivity",
+    "brandColor": "#F06A6A",
+    "logoAssetName": "AsanaLogo"
+  },
+  {
+    "id": "trello",
+    "name": "Trello",
+    "aliases": ["Trello Premium", "Trello Standard"],
+    "domains": ["trello.com"],
+    "category": "productivity",
+    "brandColor": "#0052CC",
+    "logoAssetName": "TrelloLogo"
+  },
+  {
+    "id": "linear",
+    "name": "Linear",
+    "aliases": ["Linear App"],
+    "domains": ["linear.app"],
+    "category": "productivity",
+    "brandColor": "#5E6AD2",
+    "logoAssetName": "LinearLogo"
+  },
+  {
+    "id": "gmail",
+    "name": "Gmail",
+    "aliases": ["Google Mail"],
+    "domains": ["gmail.com", "mail.google.com"],
+    "category": "productivity",
+    "brandColor": "#EA4335",
+    "logoAssetName": "GmailLogo"
+  },
+  {
+    "id": "proton_mail",
+    "name": "Proton Mail",
+    "aliases": ["ProtonMail", "Proton Unlimited"],
+    "domains": ["proton.me", "protonmail.com"],
+    "category": "utilities",
+    "brandColor": "#6D4AFF",
+    "logoAssetName": "ProtonLogo"
+  },
+  {
+    "id": "dashlane",
+    "name": "Dashlane",
+    "aliases": ["Dashlane Premium", "Dashlane Business"],
+    "domains": ["dashlane.com"],
+    "category": "vpn",
+    "brandColor": "#0E6B52",
+    "logoAssetName": "DashlaneLogo"
+  },
+  {
+    "id": "setapp",
+    "name": "Setapp",
+    "aliases": ["Setapp Subscription"],
+    "domains": ["setapp.com"],
+    "category": "productivity",
+    "brandColor": "#7B68EE",
+    "logoAssetName": "SetappLogo"
+  },
+  {
+    "id": "bear",
+    "name": "Bear",
+    "aliases": ["Bear Pro", "Bear Notes"],
+    "domains": ["bear.app"],
+    "category": "productivity",
+    "brandColor": "#DD4C4F",
+    "logoAssetName": "BearLogo"
+  },
+  {
+    "id": "craft",
+    "name": "Craft",
+    "aliases": ["Craft Pro", "Craft Docs"],
+    "domains": ["craft.do"],
+    "category": "productivity",
+    "brandColor": "#000000",
+    "logoAssetName": "CraftLogo"
+  },
+  {
+    "id": "arc",
+    "name": "Arc",
+    "aliases": ["Arc Browser", "The Browser Company"],
+    "domains": ["arc.net", "thebrowser.company"],
+    "category": "utilities",
+    "brandColor": "#000000",
+    "logoAssetName": "ArcLogo"
+  },
+  {
+    "id": "superhuman",
+    "name": "Superhuman",
+    "aliases": ["Superhuman Mail"],
+    "domains": ["superhuman.com"],
+    "category": "productivity",
+    "brandColor": "#4169E1",
+    "logoAssetName": "SuperhumanLogo"
+  },
+  {
+    "id": "raycast",
+    "name": "Raycast",
+    "aliases": ["Raycast Pro"],
+    "domains": ["raycast.com"],
+    "category": "productivity",
+    "brandColor": "#FF6363",
+    "logoAssetName": "RaycastLogo"
+  },
+  {
+    "id": "cleanmymac",
+    "name": "CleanMyMac",
+    "aliases": ["CleanMyMac X", "MacPaw CleanMyMac"],
+    "domains": ["macpaw.com", "cleanmymac.com"],
+    "category": "utilities",
+    "brandColor": "#26ABE3",
+    "logoAssetName": "CleanMyMacLogo"
+  },
+  {
+    "id": "parallels",
+    "name": "Parallels",
+    "aliases": ["Parallels Desktop"],
+    "domains": ["parallels.com"],
+    "category": "utilities",
+    "brandColor": "#FF3333",
+    "logoAssetName": "ParallelsLogo"
+  },
+  {
+    "id": "sketch",
+    "name": "Sketch",
+    "aliases": ["Sketch App"],
+    "domains": ["sketch.com"],
+    "category": "productivity",
+    "brandColor": "#F7B500",
+    "logoAssetName": "SketchLogo"
+  },
+  {
+    "id": "affinity",
+    "name": "Affinity",
+    "aliases": ["Affinity Designer", "Affinity Photo", "Serif Affinity"],
+    "domains": ["affinity.serif.com"],
+    "category": "productivity",
+    "brandColor": "#4ECFF2",
+    "logoAssetName": "AffinityLogo"
+  },
+  {
+    "id": "procreate",
+    "name": "Procreate",
+    "aliases": ["Procreate Dreams"],
+    "domains": ["procreate.com"],
+    "category": "productivity",
+    "brandColor": "#000000",
+    "logoAssetName": "ProcreateLogo"
+  }
+]
