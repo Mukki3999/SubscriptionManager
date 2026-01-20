@@ -7,12 +7,25 @@
 
 import SwiftUI
 
-/// Container view that manages the scan → review → home flow
+/// Container view that manages the scan → review → paywall → home flow
 struct InboxFlowView: View {
 
     @StateObject private var viewModel = InboxViewModel()
     @StateObject private var accountViewModel = AccountConnectionViewModel()
     @Binding var showHome: Bool
+
+    @State private var showPaywall = false
+    @State private var paywallDismissed = false
+
+    // Number of subscriptions detected for paywall messaging
+    private var detectedCount: Int {
+        viewModel.subscriptions.count
+    }
+
+    // Check if paywall should be shown (more than 5 subscriptions detected and user hasn't seen paywall yet)
+    private var shouldShowPaywall: Bool {
+        detectedCount > 5 && !paywallDismissed && TierManager.shared.currentTier == .free
+    }
 
     var body: some View {
         ZStack {
@@ -27,6 +40,8 @@ struct InboxFlowView: View {
                                 hasGmailAccount: accountViewModel.gmailAccount != nil,
                                 hasStoreKitAccess: accountViewModel.hasStoreKitAccess
                             )
+                            // Mark free scan as used
+                            TierManager.shared.markFreeScanUsed()
                         }
                     }
 
@@ -38,7 +53,12 @@ struct InboxFlowView: View {
                 SubscriptionReviewView(
                     viewModel: viewModel,
                     onComplete: {
-                        showHome = true
+                        // Check if we should show paywall before going home
+                        if shouldShowPaywall {
+                            showPaywall = true
+                        } else {
+                            showHome = true
+                        }
                     }
                 )
                 .transition(.move(edge: .trailing))
@@ -60,6 +80,20 @@ struct InboxFlowView: View {
             if let error = viewModel.errorMessage {
                 Text(error)
             }
+        }
+        .fullScreenCover(isPresented: $showPaywall) {
+            PaywallView(
+                trigger: .onboarding,
+                detectedSubscriptionCount: detectedCount,
+                onContinueFree: {
+                    paywallDismissed = true
+                    showHome = true
+                },
+                onPurchaseSuccess: {
+                    paywallDismissed = true
+                    showHome = true
+                }
+            )
         }
     }
 }

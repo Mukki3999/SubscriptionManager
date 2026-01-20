@@ -62,6 +62,33 @@ final class HomeViewModel: ObservableObject {
     @Published var isBalanceHidden: Bool = false
     @Published var userName: String = "User"
 
+    // MARK: - Tier Management
+
+    /// Current subscription count
+    var subscriptionCount: Int {
+        subscriptions.count
+    }
+
+    /// Check if user can add more subscriptions based on their tier
+    var canAddSubscription: Bool {
+        TierManager.shared.canAddSubscription(currentCount: subscriptionCount)
+    }
+
+    /// Check if user has reached their subscription limit
+    var hasReachedLimit: Bool {
+        TierManager.shared.hasReachedLimit(currentCount: subscriptionCount)
+    }
+
+    /// Number of remaining subscription slots for free tier
+    var remainingSlots: Int {
+        TierManager.shared.remainingSlots(currentCount: subscriptionCount)
+    }
+
+    /// Current user tier
+    var currentTier: SubscriptionTier {
+        TierManager.shared.currentTier
+    }
+
     // MARK: - Dependencies
 
     private let subscriptionProvider: SubscriptionProviding

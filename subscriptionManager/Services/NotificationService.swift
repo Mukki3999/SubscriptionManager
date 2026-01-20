@@ -107,19 +107,35 @@ final class NotificationService {
     /// Schedule notifications for all subscriptions at specified reminder days
     /// - Parameters:
     ///   - subscriptions: Array of subscriptions to schedule notifications for
-    ///   - reminderDays: Array of days before renewal to send notifications (default: [3, 1])
-    func scheduleAllNotifications(for subscriptions: [Subscription], reminderDays: [Int] = [3, 1]) async {
+    ///   - reminderDays: Array of days before renewal to send notifications (default: based on tier)
+    @MainActor
+    func scheduleAllNotifications(for subscriptions: [Subscription], reminderDays: [Int]? = nil) async {
         // First, remove all pending notifications
         notificationCenter.removeAllPendingNotificationRequests()
+
+        // Use tier-based reminder days if not explicitly provided
+        let effectiveReminderDays = reminderDays ?? TierManager.shared.currentTier.availableReminderDays
 
         // Schedule new notifications for each subscription
         for subscription in subscriptions {
             guard subscription.nextBillingDate != nil else { continue }
 
-            for days in reminderDays {
+            for days in effectiveReminderDays {
                 await scheduleRenewalNotification(for: subscription, daysBeforeRenewal: days)
             }
         }
+    }
+
+    /// Get available reminder day options based on user tier
+    @MainActor
+    func getAvailableReminderDays() -> [Int] {
+        TierManager.shared.currentTier.availableReminderDays
+    }
+
+    /// Check if user can customize notification reminders (Pro feature)
+    @MainActor
+    func canCustomizeReminders() -> Bool {
+        TierManager.shared.currentTier.canCustomizeNotifications
     }
 
     // MARK: - Remove Notifications

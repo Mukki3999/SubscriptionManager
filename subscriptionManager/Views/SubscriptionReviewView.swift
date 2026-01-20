@@ -125,9 +125,12 @@ struct SubscriptionReviewView: View {
             .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $showingAddSheet) {
-            AddSubscriptionView { subscription in
-                viewModel.addSubscription(subscription)
-            }
+            AddSubscriptionView(
+                onSubscriptionAdded: { subscription in
+                    viewModel.addSubscription(subscription)
+                },
+                currentSubscriptionCount: viewModel.subscriptions.count
+            )
         }
     }
 

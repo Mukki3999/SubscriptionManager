@@ -91,9 +91,12 @@ struct HomeView: View {
             }
             .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(isPresented: $showAddSubscription) {
-                AddSubscriptionView { subscription in
-                    viewModel.addSubscription(subscription)
-                }
+                AddSubscriptionView(
+                    onSubscriptionAdded: { subscription in
+                        viewModel.addSubscription(subscription)
+                    },
+                    currentSubscriptionCount: viewModel.subscriptionCount
+                )
             }
             .onAppear {
                 viewModel.loadSubscriptions()

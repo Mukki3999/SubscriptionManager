@@ -7,6 +7,7 @@
 
 import SwiftUI
 import UserNotifications
+import StoreKit
 
 // MARK: - App Delegate
 
@@ -18,6 +19,12 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     ) -> Bool {
         // Set notification center delegate
         UNUserNotificationCenter.current().delegate = self
+
+        // Initialize purchase service and check subscription status
+        Task {
+            await PurchaseService.shared.checkSubscriptionStatus()
+        }
+
         return true
     }
 

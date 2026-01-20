@@ -11,9 +11,17 @@ import UIKit
 struct AddSubscriptionView: View {
     @Environment(\.dismiss) private var dismiss
     let onSubscriptionAdded: (Subscription) -> Void
+    let currentSubscriptionCount: Int
+
     @State private var searchText = ""
     @State private var selectedCompany: Company?
     @State private var selectedCategory: CompanyCategory?
+    @State private var showPaywall = false
+
+    // Check if user can add more subscriptions
+    private var canAddSubscription: Bool {
+        TierManager.shared.canAddSubscription(currentCount: currentSubscriptionCount)
+    }
 
     // Fallback companies if JSON isn't loaded
     private var defaultCompanies: [Company] {
@@ -126,6 +134,26 @@ struct AddSubscriptionView: View {
                     dismiss()
                 }
             )
+        }
+        .fullScreenCover(isPresented: $showPaywall, onDismiss: {
+            // If user dismissed paywall without upgrading, go back
+            if !canAddSubscription {
+                dismiss()
+            }
+        }) {
+            PaywallView(
+                trigger: .subscriptionLimit,
+                onContinueFree: nil,
+                onPurchaseSuccess: {
+                    // After successful purchase, user can continue adding
+                }
+            )
+        }
+        .onAppear {
+            // Show paywall if user has reached limit
+            if !canAddSubscription {
+                showPaywall = true
+            }
         }
     }
 
@@ -589,5 +617,5 @@ private struct ScaleButtonStyle: ButtonStyle {
 // MARK: - Preview
 
 #Preview {
-    AddSubscriptionView { _ in }
+    AddSubscriptionView(onSubscriptionAdded: { _ in }, currentSubscriptionCount: 3)
 }
