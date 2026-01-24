@@ -154,6 +154,7 @@ final class PurchaseService: ObservableObject {
                     hasActiveSubscription = true
                     subscriptionExpirationDate = transaction.expirationDate
                     TierManager.shared.updateTier(.pro)
+                    AnalyticsService.setUserProperty("pro", for: "subscription_status")
                     return
                 }
             }
@@ -163,6 +164,7 @@ final class PurchaseService: ObservableObject {
         hasActiveSubscription = false
         subscriptionExpirationDate = nil
         TierManager.shared.updateTier(.free)
+        AnalyticsService.setUserProperty("free", for: "subscription_status")
     }
 
     /// Get the monthly product

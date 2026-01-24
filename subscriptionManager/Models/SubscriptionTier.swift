@@ -19,7 +19,7 @@ enum SubscriptionTier: String, Codable {
     /// Maximum number of subscriptions allowed
     var maxSubscriptions: Int {
         switch self {
-        case .free: return 5
+        case .free: return 3
         case .pro: return .max
         }
     }

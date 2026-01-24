@@ -90,6 +90,7 @@ struct PaywallView: View {
                 HStack {
                     Spacer()
                     Button {
+                        AnalyticsService.event("paywall_close", params: paywallAnalyticsParams)
                         dismiss()
                     } label: {
                         Image(systemName: "xmark")
@@ -158,6 +159,7 @@ struct PaywallView: View {
                 // Continue free
                 if onContinueFree != nil {
                     Button {
+                        AnalyticsService.event("paywall_continue_free", params: paywallAnalyticsParams)
                         onContinueFree?()
                         dismiss()
                     } label: {
@@ -199,6 +201,10 @@ struct PaywallView: View {
                 dismiss()
             }
         }
+        .onAppear {
+            AnalyticsService.screen("paywall")
+            AnalyticsService.event("paywall_view", params: paywallAnalyticsParams)
+        }
         .alert("Error", isPresented: $viewModel.showError) {
             Button("OK", role: .cancel) {}
         } message: {
@@ -212,6 +218,23 @@ struct PaywallView: View {
                 loadingOverlay
             }
         }
+    }
+
+    private var paywallAnalyticsParams: [String: Any] {
+        var params: [String: Any] = [
+            "trigger": viewModel.trigger.analyticsValue,
+            "selected_plan": viewModel.selectedPlan.analyticsValue
+        ]
+
+        if let detectedSubscriptionCount = viewModel.detectedSubscriptionCount {
+            params["detected_subscription_count"] = detectedSubscriptionCount
+        }
+
+        if case .featureGate(let feature) = viewModel.trigger {
+            params["feature"] = feature
+        }
+
+        return params
     }
 
     // MARK: - Social Proof Carousel
@@ -319,6 +342,17 @@ struct PaywallView: View {
 
     private func planOption(plan: PremiumProduct, isSelected: Bool, showBadge: Bool) -> some View {
         Button {
+            var params: [String: Any] = [
+                "trigger": viewModel.trigger.analyticsValue,
+                "selected_plan": plan.analyticsValue
+            ]
+            if let detectedSubscriptionCount = viewModel.detectedSubscriptionCount {
+                params["detected_subscription_count"] = detectedSubscriptionCount
+            }
+            if case .featureGate(let feature) = viewModel.trigger {
+                params["feature"] = feature
+            }
+            AnalyticsService.event("paywall_plan_selected", params: params)
             withAnimation(.easeInOut(duration: 0.15)) {
                 viewModel.selectedPlan = plan
             }

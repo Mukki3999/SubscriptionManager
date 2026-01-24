@@ -8,6 +8,7 @@
 import SwiftUI
 import UserNotifications
 import StoreKit
+import FirebaseCore
 
 // MARK: - App Delegate
 
@@ -17,6 +18,8 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
+        FirebaseApp.configure()
+
         // Set notification center delegate
         UNUserNotificationCenter.current().delegate = self
 

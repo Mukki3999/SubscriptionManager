@@ -164,7 +164,11 @@ final class HomeViewModel: ObservableObject {
         self.subscriptionProvider = subscriptionProvider
         loadOrder()
         loadColorIndices()
+        migrateColorsIfNeeded()
     }
+
+    /// Migration key to track if colors have been reassigned
+    private let colorMigrationKey = "hasReassignedColorsV1"
 
     // MARK: - Public Methods
 
@@ -182,6 +186,11 @@ final class HomeViewModel: ObservableObject {
     /// Get card color for subscription at index
     func cardColor(for index: Int) -> Color {
         SubscriptionCardColor.color(for: index).backgroundColor
+    }
+
+    /// Preview the next available card color for a newly added subscription
+    func nextAvailableCardColor() -> Color {
+        SubscriptionCardColors.color(for: nextAvailableColorIndex())
     }
 
     /// Get the persistent color index for a subscription by its ID
@@ -292,19 +301,52 @@ final class HomeViewModel: ObservableObject {
 
         for subscription in newSubscriptions {
             customOrderIds.append(subscription.id)
-            // Assign color based on merchantId hash for consistency with Add Details view
-            colorIndices[subscription.id] = colorIndexForMerchantId(subscription.merchantId)
+            // Assign color based on position - next available color that hasn't been used recently
+            colorIndices[subscription.id] = nextAvailableColorIndex()
         }
 
         saveOrder()
         saveColorIndices()
     }
 
-    /// Compute a consistent color index based on merchantId
-    /// This ensures the same company always gets the same color across the app
-    private func colorIndexForMerchantId(_ merchantId: String) -> Int {
-        let hash = abs(merchantId.hashValue)
-        return hash % SubscriptionCardColors.cardRotation.count
+    /// Get the next available color index, cycling through all colors before repeating
+    private func nextAvailableColorIndex() -> Int {
+        let totalColors = SubscriptionCardColors.cardRotation.count
+        let usedColors = Set(colorIndices.values)
+
+        // If we've used all colors, start from the beginning based on count
+        if usedColors.count >= totalColors {
+            return colorIndices.count % totalColors
+        }
+
+        // Find the first unused color index
+        for i in 0..<totalColors {
+            if !usedColors.contains(i) {
+                return i
+            }
+        }
+
+        // Fallback: use count-based index
+        return colorIndices.count % totalColors
+    }
+
+    /// One-time migration to reassign colors sequentially (fixes duplicate colors issue)
+    private func migrateColorsIfNeeded() {
+        guard !UserDefaults.standard.bool(forKey: colorMigrationKey) else {
+            return
+        }
+
+        // Reassign all colors sequentially based on order
+        let totalColors = SubscriptionCardColors.cardRotation.count
+        var newColorIndices: [UUID: Int] = [:]
+
+        for (index, subscriptionId) in customOrderIds.enumerated() {
+            newColorIndices[subscriptionId] = index % totalColors
+        }
+
+        colorIndices = newColorIndices
+        saveColorIndices()
+        UserDefaults.standard.set(true, forKey: colorMigrationKey)
     }
 }
 

@@ -96,6 +96,14 @@ final class InboxViewModel: ObservableObject {
 
     // MARK: - Public Methods
 
+    /// Start manual review flow (skip scanning)
+    func startManualEntry() {
+        errorMessage = nil
+        subscriptions = []
+        scanProgress = .initial
+        viewState = .review
+    }
+
     /// Start scanning for subscriptions from all connected sources in parallel
     /// - Parameter hasStoreKitAccess: Whether StoreKit transaction access is available
     /// - Parameter hasGmailAccount: Whether a Gmail account is connected

@@ -39,7 +39,7 @@ enum PaywallTrigger {
         case .onboarding:
             return "Track all your subscriptions and never miss a renewal"
         case .subscriptionLimit:
-            return "Free accounts can track up to 5 subscriptions"
+            return "Free accounts can track up to 3 subscriptions"
         case .featureGate:
             return "Get access to all Pro features"
         case .settings:
@@ -142,18 +142,23 @@ final class PaywallViewModel: ObservableObject {
 
         isProcessing = true
         errorMessage = nil
+        AnalyticsService.event("paywall_purchase_start", params: purchaseAnalyticsParams(productID: product.id))
 
         do {
             try await purchaseService.purchase(product)
+            AnalyticsService.event("paywall_purchase_success", params: purchaseAnalyticsParams(productID: product.id))
             purchaseSuccessful = true
         } catch let error as PurchaseError {
             if case .purchaseCancelled = error {
                 // User cancelled, don't show error
+                AnalyticsService.event("paywall_purchase_cancelled", params: purchaseAnalyticsParams(productID: product.id))
             } else {
+                AnalyticsService.event("paywall_purchase_failed", params: purchaseAnalyticsParams(productID: product.id, error: error.localizedDescription))
                 errorMessage = error.localizedDescription
                 showError = true
             }
         } catch {
+            AnalyticsService.event("paywall_purchase_failed", params: purchaseAnalyticsParams(productID: product.id, error: error.localizedDescription))
             errorMessage = "Purchase failed. Please try again."
             showError = true
         }
@@ -165,17 +170,21 @@ final class PaywallViewModel: ObservableObject {
     func restorePurchases() async {
         isProcessing = true
         errorMessage = nil
+        AnalyticsService.event("paywall_restore_start", params: baseAnalyticsParams())
 
         do {
             try await purchaseService.restorePurchases()
 
             if purchaseService.hasActiveSubscription {
+                AnalyticsService.event("paywall_restore_success", params: baseAnalyticsParams())
                 purchaseSuccessful = true
             } else {
+                AnalyticsService.event("paywall_restore_failed", params: baseAnalyticsParams())
                 errorMessage = "No active subscription found"
                 showError = true
             }
         } catch {
+            AnalyticsService.event("paywall_restore_failed", params: baseAnalyticsParams())
             errorMessage = "Could not restore purchases. Please try again."
             showError = true
         }
@@ -197,5 +206,61 @@ final class PaywallViewModel: ObservableObject {
     func monthlyEquivalent(for plan: PremiumProduct) -> String? {
         guard plan == .annual else { return nil }
         return annualProduct?.monthlyEquivalent.map { "\($0)/mo" }
+    }
+
+    // MARK: - Analytics Helpers
+
+    private func baseAnalyticsParams() -> [String: Any] {
+        var params: [String: Any] = [
+            "trigger": trigger.analyticsValue,
+            "selected_plan": selectedPlan.analyticsValue
+        ]
+
+        if let detectedSubscriptionCount {
+            params["detected_subscription_count"] = detectedSubscriptionCount
+        }
+
+        if case .featureGate(let feature) = trigger {
+            params["feature"] = feature
+        }
+
+        return params
+    }
+
+    private func purchaseAnalyticsParams(productID: String, error: String? = nil) -> [String: Any] {
+        var params = baseAnalyticsParams()
+        params["product_id"] = productID
+        if let error {
+            params["error"] = error
+        }
+        return params
+    }
+}
+
+extension PaywallTrigger {
+    var analyticsValue: String {
+        switch self {
+        case .onboarding:
+            return "onboarding"
+        case .subscriptionLimit:
+            return "subscription_limit"
+        case .featureGate:
+            return "feature_gate"
+        case .settings:
+            return "settings"
+        case .rescan:
+            return "rescan"
+        }
+    }
+}
+
+extension PremiumProduct {
+    var analyticsValue: String {
+        switch self {
+        case .monthly:
+            return "monthly"
+        case .annual:
+            return "annual"
+        }
     }
 }

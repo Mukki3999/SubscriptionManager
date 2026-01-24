@@ -59,12 +59,15 @@ struct AccountConnectionView: View {
 
     @StateObject private var viewModel = AccountConnectionViewModel()
     let onContinue: () -> Void
+    let onAddManually: () -> Void
 
     @State private var appeared = false
     @State private var buttonsAppeared = false
+    @State private var didRequestNotifications = false
 
-    init(onContinue: @escaping () -> Void = {}) {
+    init(onContinue: @escaping () -> Void = {}, onAddManually: @escaping () -> Void = {}) {
         self.onContinue = onContinue
+        self.onAddManually = onAddManually
     }
 
     var body: some View {
@@ -131,6 +134,7 @@ struct AccountConnectionView: View {
             }
         }
         .onAppear {
+            requestNotificationPermissionIfNeeded()
             withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
                 appeared = true
             }
@@ -151,6 +155,16 @@ struct AccountConnectionView: View {
             if viewModel.isLoading {
                 loadingOverlay
             }
+        }
+    }
+    
+    private func requestNotificationPermissionIfNeeded() {
+        guard !didRequestNotifications else { return }
+        didRequestNotifications = true
+        Task {
+            let status = await NotificationService.shared.checkPermissionStatus()
+            guard status == .notDetermined else { return }
+            _ = await NotificationService.shared.requestPermission()
         }
     }
 
@@ -315,16 +329,24 @@ struct AccountConnectionView: View {
     // MARK: - Continue Button
     private var continueButton: some View {
         Button(action: {
-            onContinue()
+            if viewModel.hasConnectedAccounts {
+                onContinue()
+            } else {
+                onAddManually()
+            }
         }) {
-            Text("Continue to Inbox")
+            Text(viewModel.hasConnectedAccounts ? "Continue to Inbox" : "Add Subscriptions Manually")
                 .font(.system(size: 17, weight: .semibold))
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 18)
                 .background(
                     RoundedRectangle(cornerRadius: 14)
-                        .fill(Color(red: 0.25, green: 0.52, blue: 0.96))
+                        .fill(viewModel.hasConnectedAccounts ? Color(red: 0.25, green: 0.52, blue: 0.96) : Color.black)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 14)
+                                .stroke(Color.white.opacity(viewModel.hasConnectedAccounts ? 0 : 0.12), lineWidth: 1)
+                        )
                 )
         }
         .buttonStyle(PremiumButtonStyle())

@@ -12,55 +12,36 @@ struct AddSubscriptionView: View {
     @Environment(\.dismiss) private var dismiss
     let onSubscriptionAdded: (Subscription) -> Void
     let currentSubscriptionCount: Int
+    let previewCardColor: Color
 
+    @StateObject private var companyService = CompanyLogoService.shared
     @State private var searchText = ""
     @State private var selectedCompany: Company?
     @State private var selectedCategory: CompanyCategory?
     @State private var showPaywall = false
+
+    init(
+        onSubscriptionAdded: @escaping (Subscription) -> Void,
+        currentSubscriptionCount: Int,
+        previewCardColor: Color = SubscriptionCardColors.softBlue
+    ) {
+        self.onSubscriptionAdded = onSubscriptionAdded
+        self.currentSubscriptionCount = currentSubscriptionCount
+        self.previewCardColor = previewCardColor
+    }
 
     // Check if user can add more subscriptions
     private var canAddSubscription: Bool {
         TierManager.shared.canAddSubscription(currentCount: currentSubscriptionCount)
     }
 
-    // Fallback companies if JSON isn't loaded
+    // All companies - hardcoded for reliability
     private var defaultCompanies: [Company] {
-        [
-            Company(id: "netflix", name: "Netflix", aliases: [], domains: ["netflix.com"], category: .streaming, brandColor: "#E50914", logoAssetName: "NetflixLogo"),
-            Company(id: "spotify", name: "Spotify", aliases: [], domains: ["spotify.com"], category: .music, brandColor: "#1DB954", logoAssetName: "SpotifyLogo"),
-            Company(id: "disney_plus", name: "Disney+", aliases: [], domains: ["disneyplus.com"], category: .streaming, brandColor: "#113CCF", logoAssetName: "DisneyPlusLogo"),
-            Company(id: "youtube", name: "YouTube Premium", aliases: [], domains: ["youtube.com"], category: .streaming, brandColor: "#FF0000", logoAssetName: "YouTubeLogo"),
-            Company(id: "hulu", name: "Hulu", aliases: [], domains: ["hulu.com"], category: .streaming, brandColor: "#1CE783", logoAssetName: "HuluLogo"),
-            Company(id: "max", name: "Max", aliases: ["HBO Max"], domains: ["max.com"], category: .streaming, brandColor: "#002BE7", logoAssetName: "MaxLogo"),
-            Company(id: "apple_music", name: "Apple Music", aliases: [], domains: ["apple.com"], category: .music, brandColor: "#FC3C44", logoAssetName: "AppleMusicLogo"),
-            Company(id: "amazon_prime", name: "Amazon Prime", aliases: [], domains: ["amazon.com"], category: .streaming, brandColor: "#00A8E1", logoAssetName: "AmazonPrimeLogo"),
-            Company(id: "chatgpt", name: "ChatGPT Plus", aliases: ["OpenAI"], domains: ["openai.com"], category: .ai, brandColor: "#10A37F", logoAssetName: "OpenAILogo"),
-            Company(id: "adobe", name: "Adobe Creative Cloud", aliases: [], domains: ["adobe.com"], category: .productivity, brandColor: "#FF0000", logoAssetName: "AdobeLogo"),
-            Company(id: "figma", name: "Figma", aliases: [], domains: ["figma.com"], category: .productivity, brandColor: "#F24E1E", logoAssetName: "FigmaLogo"),
-            Company(id: "notion", name: "Notion", aliases: [], domains: ["notion.so"], category: .productivity, brandColor: "#000000", logoAssetName: "NotionLogo"),
-            Company(id: "slack", name: "Slack", aliases: [], domains: ["slack.com"], category: .productivity, brandColor: "#4A154B", logoAssetName: "SlackLogo"),
-            Company(id: "dropbox", name: "Dropbox", aliases: [], domains: ["dropbox.com"], category: .cloud, brandColor: "#0061FF", logoAssetName: "DropboxLogo"),
-            Company(id: "icloud", name: "iCloud+", aliases: [], domains: ["icloud.com"], category: .cloud, brandColor: "#3693F3", logoAssetName: "iCloudLogo"),
-            Company(id: "1password", name: "1Password", aliases: [], domains: ["1password.com"], category: .vpn, brandColor: "#0094F5", logoAssetName: "1PasswordLogo"),
-            Company(id: "nordvpn", name: "NordVPN", aliases: [], domains: ["nordvpn.com"], category: .vpn, brandColor: "#4687FF", logoAssetName: "NordVPNLogo"),
-            Company(id: "discord", name: "Discord Nitro", aliases: [], domains: ["discord.com"], category: .social, brandColor: "#5865F2", logoAssetName: "DiscordLogo"),
-            Company(id: "linkedin", name: "LinkedIn Premium", aliases: [], domains: ["linkedin.com"], category: .social, brandColor: "#0A66C2", logoAssetName: "LinkedInLogo"),
-            Company(id: "xbox", name: "Xbox Game Pass", aliases: [], domains: ["xbox.com"], category: .gaming, brandColor: "#107C10", logoAssetName: "XboxLogo"),
-            Company(id: "playstation", name: "PlayStation Plus", aliases: [], domains: ["playstation.com"], category: .gaming, brandColor: "#003791", logoAssetName: "PlayStationLogo"),
-            Company(id: "twitch", name: "Twitch", aliases: [], domains: ["twitch.tv"], category: .gaming, brandColor: "#9146FF", logoAssetName: "TwitchLogo"),
-            Company(id: "strava", name: "Strava", aliases: [], domains: ["strava.com"], category: .fitness, brandColor: "#FC4C02", logoAssetName: "StravaLogo"),
-            Company(id: "headspace", name: "Headspace", aliases: [], domains: ["headspace.com"], category: .fitness, brandColor: "#F47D31", logoAssetName: "HeadspaceLogo"),
-            Company(id: "duolingo", name: "Duolingo Plus", aliases: [], domains: ["duolingo.com"], category: .education, brandColor: "#58CC02", logoAssetName: "DuolingoLogo"),
-            Company(id: "masterclass", name: "MasterClass", aliases: [], domains: ["masterclass.com"], category: .education, brandColor: "#000000", logoAssetName: "MasterClassLogo"),
-            Company(id: "nytimes", name: "The New York Times", aliases: [], domains: ["nytimes.com"], category: .news, brandColor: "#000000", logoAssetName: "NYTimesLogo"),
-            Company(id: "medium", name: "Medium", aliases: [], domains: ["medium.com"], category: .news, brandColor: "#000000", logoAssetName: "MediumLogo"),
-            Company(id: "doordash", name: "DoorDash DashPass", aliases: [], domains: ["doordash.com"], category: .food, brandColor: "#FF3008", logoAssetName: "DoorDashLogo"),
-            Company(id: "ubereats", name: "Uber One", aliases: [], domains: ["uber.com"], category: .food, brandColor: "#06C167", logoAssetName: "UberEatsLogo"),
-        ]
+        CompanyCatalog.all
     }
 
     private var companies: [Company] {
-        let loaded = CompanyLogoService.shared.companies
+        let loaded = companyService.companies
         return loaded.isEmpty ? defaultCompanies : loaded
     }
 
@@ -128,7 +109,7 @@ struct AddSubscriptionView: View {
         .sheet(item: $selectedCompany) { company in
             SubscriptionDetailEntryView(
                 company: company,
-                cardColor: cardColorForCompany(company),
+                cardColor: previewCardColor,
                 onSubscriptionAdded: onSubscriptionAdded,
                 onSave: {
                     dismiss()
@@ -150,21 +131,18 @@ struct AddSubscriptionView: View {
             )
         }
         .onAppear {
+            AnalyticsService.screen("add_subscription")
+            AnalyticsService.event("add_subscription_view")
             // Show paywall if user has reached limit
             if !canAddSubscription {
                 showPaywall = true
             }
         }
-    }
-
-    // MARK: - Color Assignment
-
-    private func cardColorForCompany(_ company: Company) -> Color {
-        // Use a hash of the company ID to get a consistent color
-        // This matches the HomeViewModel's colorIndexForMerchantId approach
-        let hash = abs(company.id.hashValue)
-        let colorIndex = hash % SubscriptionCardColors.cardRotation.count
-        return SubscriptionCardColors.cardRotation[colorIndex]
+        .onChange(of: showPaywall) { _, isShowing in
+            if isShowing {
+                AnalyticsService.event("add_subscription_paywall_triggered")
+            }
+        }
     }
 
     // MARK: - Company List
@@ -193,6 +171,9 @@ struct AddSubscriptionView: View {
                     let company = companies[index]
                     CompanyRowView(company: company)
                         .onTapGesture {
+                            AnalyticsService.event("add_subscription_company_selected", params: [
+                                "company_id": company.id
+                            ])
                             selectedCompany = company
                         }
 
@@ -359,6 +340,9 @@ struct SubscriptionDetailEntryView: View {
     @State private var price: String = ""
     @State private var billingCycle: BillingCycle = .monthly
     @State private var nextBillingDate = Date()
+    @State private var selectedReminderDays: Int = 3
+    @State private var showReminderPaywall = false
+    @State private var showPriceError = false
 
     // MARK: - Theme Constants
 
@@ -403,6 +387,12 @@ struct SubscriptionDetailEntryView: View {
             }
             .toolbarBackground(backgroundColor, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
+            .fullScreenCover(isPresented: $showReminderPaywall) {
+                PaywallView(trigger: .featureGate("Custom Reminders"))
+            }
+            .alert("Price can't be empty", isPresented: $showPriceError) {
+                Button("OK", role: .cancel) {}
+            }
         }
     }
 
@@ -540,7 +530,63 @@ struct SubscriptionDetailEntryView: View {
                     .tint(.black.opacity(0.85))
             }
             .padding(.vertical, 11)
+
+            rowDivider
+
+            // Reminder row
+            reminderRow
         }
+    }
+
+    // MARK: - Reminder Row
+
+    private var reminderRow: some View {
+        HStack {
+            Text("Remind me")
+                .font(.system(size: 15, weight: .medium))
+                .foregroundColor(.black.opacity(0.6))
+
+            Spacer()
+
+            if TierManager.shared.currentTier.canCustomizeNotifications {
+                // Pro users: Picker with options
+                Picker("", selection: $selectedReminderDays) {
+                    Text("1 day before").tag(1)
+                    Text("3 days before").tag(3)
+                    Text("7 days before").tag(7)
+                }
+                .pickerStyle(.menu)
+                .tint(.black.opacity(0.85))
+            } else {
+                // Free users: Locked with PRO badge
+                Button {
+                    showReminderPaywall = true
+                } label: {
+                    HStack(spacing: 8) {
+                        Text("3 days before")
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundColor(.black.opacity(0.4))
+
+                        reminderProBadge
+                    }
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(.vertical, 14)
+    }
+
+    private var reminderProBadge: some View {
+        HStack(spacing: 4) {
+            Image(systemName: "lock.fill")
+                .font(.system(size: 10, weight: .bold))
+            Text("PRO")
+                .font(.system(size: 10, weight: .bold))
+        }
+        .foregroundColor(.black)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(Capsule().fill(Color(red: 0.78, green: 0.93, blue: 0.87)))
     }
 
     // MARK: - Add Button
@@ -554,12 +600,12 @@ struct SubscriptionDetailEntryView: View {
                 Text("Add Subscription")
                     .font(.system(size: 16, weight: .semibold))
             }
-            .foregroundColor(.black)
+            .foregroundColor(.white)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 16)
             .background(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .fill(Color.white)
+                    .fill(Color.black.opacity(0.85))
             )
         }
         .buttonStyle(ScaleButtonStyle())
@@ -582,7 +628,11 @@ struct SubscriptionDetailEntryView: View {
     // MARK: - Save Action
 
     private func saveSubscription() {
-        let priceValue = Double(price) ?? 0.0
+        let trimmedPrice = price.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedPrice.isEmpty, let priceValue = Double(trimmedPrice), priceValue > 0 else {
+            showPriceError = true
+            return
+        }
 
         let subscription = Subscription(
             merchantId: company.id,
@@ -597,6 +647,14 @@ struct SubscriptionDetailEntryView: View {
             detectedAt: Date(),
             detectionSource: .manual
         )
+
+        // Schedule notification with selected reminder days
+        Task {
+            await NotificationService.shared.scheduleRenewalNotification(
+                for: subscription,
+                daysBeforeRenewal: selectedReminderDays
+            )
+        }
 
         onSubscriptionAdded(subscription)
         dismiss()

@@ -13,6 +13,7 @@ struct InboxFlowView: View {
     @StateObject private var viewModel = InboxViewModel()
     @StateObject private var accountViewModel = AccountConnectionViewModel()
     @Binding var showHome: Bool
+    let isManualEntry: Bool
 
     @State private var showPaywall = false
     @State private var paywallDismissed = false
@@ -22,9 +23,9 @@ struct InboxFlowView: View {
         viewModel.subscriptions.count
     }
 
-    // Check if paywall should be shown (more than 5 subscriptions detected and user hasn't seen paywall yet)
+    // Check if paywall should be shown (more than 3 subscriptions detected and user hasn't seen paywall yet)
     private var shouldShowPaywall: Bool {
-        detectedCount > 5 && !paywallDismissed && TierManager.shared.currentTier == .free
+        detectedCount > 3 && !paywallDismissed && TierManager.shared.currentTier == .free
     }
 
     var body: some View {
@@ -35,6 +36,10 @@ struct InboxFlowView: View {
                 Color.black
                     .ignoresSafeArea()
                     .onAppear {
+                        if isManualEntry {
+                            viewModel.startManualEntry()
+                            return
+                        }
                         Task {
                             await viewModel.startScan(
                                 hasGmailAccount: accountViewModel.gmailAccount != nil,
@@ -101,5 +106,5 @@ struct InboxFlowView: View {
 // MARK: - Preview
 
 #Preview {
-    InboxFlowView(showHome: .constant(false))
+    InboxFlowView(showHome: .constant(false), isManualEntry: false)
 }

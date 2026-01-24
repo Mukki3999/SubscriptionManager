@@ -21,6 +21,9 @@ struct SubscriptionDetailView: View {
     let subscription: Subscription
     let logoImage: String?
     let cardColor: Color
+    let showsCancellationSection: Bool
+    let showsFromRow: Bool
+    let showsManageButton: Bool
     var onDelete: (() -> Void)?
 
     // MARK: - Theme Constants
@@ -35,11 +38,17 @@ struct SubscriptionDetailView: View {
         subscription: Subscription,
         logoImage: String? = nil,
         cardColor: Color = SubscriptionCardColors.softBlue,
+        showsCancellationSection: Bool = true,
+        showsFromRow: Bool = true,
+        showsManageButton: Bool = true,
         onDelete: (() -> Void)? = nil
     ) {
         self.subscription = subscription
         self.logoImage = logoImage
         self.cardColor = cardColor
+        self.showsCancellationSection = showsCancellationSection
+        self.showsFromRow = showsFromRow
+        self.showsManageButton = showsManageButton
         self.onDelete = onDelete
         _viewModel = StateObject(wrappedValue: SubscriptionDetailViewModel(subscription: subscription))
     }
@@ -121,7 +130,7 @@ struct SubscriptionDetailView: View {
             settingsSection
 
             // Cancellation steps (if available)
-            if let steps = viewModel.cancellationSteps, !steps.isEmpty {
+            if showsCancellationSection, let steps = viewModel.cancellationSteps, !steps.isEmpty {
                 divider
                 cancellationSection(steps: steps)
             }
@@ -139,8 +148,10 @@ struct SubscriptionDetailView: View {
             }
 
             // Manage button
-            manageButton
-                .padding(.top, 20)
+            if showsManageButton {
+                manageButton
+                    .padding(.top, 20)
+            }
         }
         .padding(20)
         .background(cardColor)
@@ -229,7 +240,7 @@ struct SubscriptionDetailView: View {
                 icon: managementTypeIcon
             )
 
-            if !viewModel.senderEmail.isEmpty {
+            if showsFromRow, !viewModel.senderEmail.isEmpty {
                 rowDivider
 
                 infoRow(

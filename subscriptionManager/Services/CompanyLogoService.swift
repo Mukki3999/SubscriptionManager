@@ -50,20 +50,9 @@ final class CompanyLogoService: ObservableObject {
     // MARK: - Database Loading
 
     private func loadCompaniesDatabase() {
-        guard let url = Bundle.main.url(forResource: "companies", withExtension: "json") else {
-            print("CompanyLogoService: companies.json not found in bundle")
-            return
-        }
-
-        do {
-            let data = try Data(contentsOf: url)
-            let decoder = JSONDecoder()
-            companies = try decoder.decode([Company].self, from: data)
-            isLoaded = true
-            print("CompanyLogoService: Loaded \(companies.count) companies")
-        } catch {
-            print("CompanyLogoService: Failed to decode companies.json - \(error)")
-        }
+        companies = CompanyCatalog.all
+        isLoaded = true
+        print("CompanyLogoService: Loaded \(companies.count) companies (bundled catalog)")
     }
 
     // MARK: - Company Matching
