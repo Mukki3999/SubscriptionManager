@@ -96,7 +96,7 @@
     "domains": ["youtube.com", "music.youtube.com"],
     "category": "streaming",
     "brandColor": "#FF0000",
-    "logoAssetName": "YouTubeLogo"
+    "logoAssetName": "YouTubeLogo 1"
   },
   {
     "id": "paramount_plus",
@@ -708,7 +708,7 @@
     "domains": ["gmail.com", "mail.google.com"],
     "category": "productivity",
     "brandColor": "#EA4335",
-    "logoAssetName": "GmailLogo"
+    "logoAssetName": "GmailLogo 1"
   },
   {
     "id": "proton_mail",
@@ -826,5 +826,824 @@
     "category": "productivity",
     "brandColor": "#000000",
     "logoAssetName": "ProcreateLogo"
+  },
+  {
+    "id": "espn_plus",
+    "name": "ESPN+",
+    "aliases": ["ESPN Plus", "ESPN Streaming"],
+    "domains": ["espn.com", "plus.espn.com"],
+    "category": "streaming",
+    "brandColor": "#FF0033",
+    "logoAssetName": "ESPN_"
+  },
+  {
+    "id": "discovery_plus",
+    "name": "Discovery+",
+    "aliases": ["Discovery Plus"],
+    "domains": ["discoveryplus.com"],
+    "category": "streaming",
+    "brandColor": "#0033FF",
+    "logoAssetName": "Discovery_"
+  },
+  {
+    "id": "amc_plus",
+    "name": "AMC+",
+    "aliases": ["AMC Plus", "AMC Streaming"],
+    "domains": ["amcplus.com", "amc.com"],
+    "category": "streaming",
+    "brandColor": "#000000",
+    "logoAssetName": "AMC_"
+  },
+  {
+    "id": "showtime",
+    "name": "Showtime",
+    "aliases": ["Showtime Streaming", "SHO"],
+    "domains": ["showtime.com", "sho.com"],
+    "category": "streaming",
+    "brandColor": "#FF0000",
+    "logoAssetName": "Showtime"
+  },
+  {
+    "id": "starz",
+    "name": "Starz",
+    "aliases": ["Starz Streaming"],
+    "domains": ["starz.com"],
+    "category": "streaming",
+    "brandColor": "#000000",
+    "logoAssetName": "Starz"
+  },
+  {
+    "id": "mubi",
+    "name": "Mubi",
+    "aliases": ["Mubi Streaming"],
+    "domains": ["mubi.com"],
+    "category": "streaming",
+    "brandColor": "#001489",
+    "logoAssetName": "Mubi"
+  },
+  {
+    "id": "criterion_channel",
+    "name": "Criterion Channel",
+    "aliases": ["Criterion Collection"],
+    "domains": ["criterionchannel.com"],
+    "category": "streaming",
+    "brandColor": "#000000",
+    "logoAssetName": "Criterion_Channel"
+  },
+  {
+    "id": "britbox",
+    "name": "BritBox",
+    "aliases": ["Brit Box"],
+    "domains": ["britbox.com"],
+    "category": "streaming",
+    "brandColor": "#E30613",
+    "logoAssetName": "BritBox"
+  },
+  {
+    "id": "shudder",
+    "name": "Shudder",
+    "aliases": ["Shudder Horror"],
+    "domains": ["shudder.com"],
+    "category": "streaming",
+    "brandColor": "#000000",
+    "logoAssetName": "Shudder"
+  },
+  {
+    "id": "dazn",
+    "name": "DAZN",
+    "aliases": ["DAZN Sports"],
+    "domains": ["dazn.com"],
+    "category": "streaming",
+    "brandColor": "#F7D200",
+    "logoAssetName": "DAZN"
+  },
+  {
+    "id": "apple_fitness",
+    "name": "Apple Fitness+",
+    "aliases": ["Apple Fitness Plus", "Fitness+"],
+    "domains": ["apple.com", "fitness.apple.com"],
+    "category": "fitness",
+    "brandColor": "#FA243C",
+    "logoAssetName": "AppleMusicLogo"
+  },
+  {
+    "id": "amazon_music",
+    "name": "Amazon Music",
+    "aliases": ["Amazon Music Unlimited", "Prime Music"],
+    "domains": ["music.amazon.com", "amazon.com"],
+    "category": "music",
+    "brandColor": "#25D1DA",
+    "logoAssetName": "Amazon_Music"
+  },
+  {
+    "id": "plex",
+    "name": "Plex",
+    "aliases": ["Plex Pass"],
+    "domains": ["plex.tv"],
+    "category": "streaming",
+    "brandColor": "#EBAF00",
+    "logoAssetName": "Plex"
+  },
+  {
+    "id": "monday",
+    "name": "Monday.com",
+    "aliases": ["Monday", "Monday Work OS"],
+    "domains": ["monday.com"],
+    "category": "productivity",
+    "brandColor": "#FF3D57",
+    "logoAssetName": "Monday_com"
+  },
+  {
+    "id": "clickup",
+    "name": "ClickUp",
+    "aliases": ["ClickUp Productivity"],
+    "domains": ["clickup.com"],
+    "category": "productivity",
+    "brandColor": "#7B68EE",
+    "logoAssetName": "ClickUp"
+  },
+  {
+    "id": "airtable",
+    "name": "Airtable",
+    "aliases": ["Airtable Pro"],
+    "domains": ["airtable.com"],
+    "category": "productivity",
+    "brandColor": "#18BFFF",
+    "logoAssetName": "Airtable"
+  },
+  {
+    "id": "coda",
+    "name": "Coda",
+    "aliases": ["Coda Docs"],
+    "domains": ["coda.io"],
+    "category": "productivity",
+    "brandColor": "#F46A54",
+    "logoAssetName": "Coda"
+  },
+  {
+    "id": "miro",
+    "name": "Miro",
+    "aliases": ["Miro Board", "Miro Whiteboard"],
+    "domains": ["miro.com"],
+    "category": "productivity",
+    "brandColor": "#FFD02F",
+    "logoAssetName": "Miro"
+  },
+  {
+    "id": "loom",
+    "name": "Loom",
+    "aliases": ["Loom Video"],
+    "domains": ["loom.com"],
+    "category": "productivity",
+    "brandColor": "#625DF5",
+    "logoAssetName": "Loom"
+  },
+  {
+    "id": "calendly",
+    "name": "Calendly",
+    "aliases": ["Calendly Pro"],
+    "domains": ["calendly.com"],
+    "category": "productivity",
+    "brandColor": "#006BFF",
+    "logoAssetName": "Calendly"
+  },
+  {
+    "id": "zapier",
+    "name": "Zapier",
+    "aliases": ["Zapier Automation"],
+    "domains": ["zapier.com"],
+    "category": "productivity",
+    "brandColor": "#FF4A00",
+    "logoAssetName": "Zapier"
+  },
+  {
+    "id": "webflow",
+    "name": "Webflow",
+    "aliases": ["Webflow Design"],
+    "domains": ["webflow.com"],
+    "category": "productivity",
+    "brandColor": "#4353FF",
+    "logoAssetName": "Webflow"
+  },
+  {
+    "id": "vercel",
+    "name": "Vercel",
+    "aliases": ["Vercel Pro"],
+    "domains": ["vercel.com"],
+    "category": "productivity",
+    "brandColor": "#000000",
+    "logoAssetName": "Vercel"
+  },
+  {
+    "id": "netlify",
+    "name": "Netlify",
+    "aliases": ["Netlify Pro"],
+    "domains": ["netlify.com"],
+    "category": "productivity",
+    "brandColor": "#00C7B7",
+    "logoAssetName": "Netlify"
+  },
+  {
+    "id": "backblaze",
+    "name": "Backblaze",
+    "aliases": ["Backblaze Backup"],
+    "domains": ["backblaze.com"],
+    "category": "cloud",
+    "brandColor": "#E21E29",
+    "logoAssetName": "Backblaze"
+  },
+  {
+    "id": "box",
+    "name": "Box",
+    "aliases": ["Box Cloud"],
+    "domains": ["box.com"],
+    "category": "cloud",
+    "brandColor": "#0061D5",
+    "logoAssetName": "Box"
+  },
+  {
+    "id": "pcloud",
+    "name": "pCloud",
+    "aliases": ["pCloud Storage"],
+    "domains": ["pcloud.com"],
+    "category": "cloud",
+    "brandColor": "#00BFFF",
+    "logoAssetName": "pCloud"
+  },
+  {
+    "id": "keeper",
+    "name": "Keeper",
+    "aliases": ["Keeper Security", "Keeper Password"],
+    "domains": ["keepersecurity.com"],
+    "category": "vpn",
+    "brandColor": "#0070C0",
+    "logoAssetName": "Keeper"
+  },
+  {
+    "id": "pia",
+    "name": "Private Internet Access",
+    "aliases": ["PIA", "PIA VPN"],
+    "domains": ["privateinternetaccess.com"],
+    "category": "vpn",
+    "brandColor": "#4BB543",
+    "logoAssetName": "Private_Internet_Access"
+  },
+  {
+    "id": "cyberghost",
+    "name": "CyberGhost",
+    "aliases": ["CyberGhost VPN"],
+    "domains": ["cyberghostvpn.com"],
+    "category": "vpn",
+    "brandColor": "#FFCC00",
+    "logoAssetName": "CyberGhost"
+  },
+  {
+    "id": "mullvad",
+    "name": "Mullvad",
+    "aliases": ["Mullvad VPN"],
+    "domains": ["mullvad.net"],
+    "category": "vpn",
+    "brandColor": "#294D73",
+    "logoAssetName": "Mullvad"
+  },
+  {
+    "id": "perplexity",
+    "name": "Perplexity",
+    "aliases": ["Perplexity AI", "Perplexity Pro"],
+    "domains": ["perplexity.ai"],
+    "category": "ai",
+    "brandColor": "#20808D",
+    "logoAssetName": "Perplexity"
+  },
+  {
+    "id": "jasper",
+    "name": "Jasper",
+    "aliases": ["Jasper AI"],
+    "domains": ["jasper.ai"],
+    "category": "ai",
+    "brandColor": "#7C3AED",
+    "logoAssetName": "Jasper"
+  },
+  {
+    "id": "runway",
+    "name": "Runway",
+    "aliases": ["Runway ML", "Runway AI"],
+    "domains": ["runwayml.com"],
+    "category": "ai",
+    "brandColor": "#000000",
+    "logoAssetName": "Runway"
+  },
+  {
+    "id": "elevenlabs",
+    "name": "ElevenLabs",
+    "aliases": ["Eleven Labs", "ElevenLabs AI"],
+    "domains": ["elevenlabs.io"],
+    "category": "ai",
+    "brandColor": "#000000",
+    "logoAssetName": "ElevenLabs"
+  },
+  {
+    "id": "descript",
+    "name": "Descript",
+    "aliases": ["Descript Video"],
+    "domains": ["descript.com"],
+    "category": "ai",
+    "brandColor": "#00D1A1",
+    "logoAssetName": "Descript"
+  },
+  {
+    "id": "otter",
+    "name": "Otter.ai",
+    "aliases": ["Otter", "Otter Transcription"],
+    "domains": ["otter.ai"],
+    "category": "ai",
+    "brandColor": "#3B82F6",
+    "logoAssetName": "Otter_ai"
+  },
+  {
+    "id": "udemy",
+    "name": "Udemy",
+    "aliases": ["Udemy Business"],
+    "domains": ["udemy.com"],
+    "category": "education",
+    "brandColor": "#A435F0",
+    "logoAssetName": "Udemy"
+  },
+  {
+    "id": "brilliant",
+    "name": "Brilliant",
+    "aliases": ["Brilliant Premium"],
+    "domains": ["brilliant.org"],
+    "category": "education",
+    "brandColor": "#000000",
+    "logoAssetName": "Brilliant"
+  },
+  {
+    "id": "blinkist",
+    "name": "Blinkist",
+    "aliases": ["Blinkist Premium"],
+    "domains": ["blinkist.com"],
+    "category": "education",
+    "brandColor": "#0B9C5B",
+    "logoAssetName": "Blinkist"
+  },
+  {
+    "id": "scribd",
+    "name": "Scribd",
+    "aliases": ["Scribd Premium"],
+    "domains": ["scribd.com"],
+    "category": "education",
+    "brandColor": "#1A7BBA",
+    "logoAssetName": "Scribd"
+  },
+  {
+    "id": "bloomberg",
+    "name": "Bloomberg",
+    "aliases": ["Bloomberg News", "Bloomberg Digital"],
+    "domains": ["bloomberg.com"],
+    "category": "news",
+    "brandColor": "#000000",
+    "logoAssetName": "Bloomberg"
+  },
+  {
+    "id": "financial_times",
+    "name": "Financial Times",
+    "aliases": ["FT", "FT Digital"],
+    "domains": ["ft.com"],
+    "category": "news",
+    "brandColor": "#FFF1E5",
+    "logoAssetName": "Financial_Times"
+  },
+  {
+    "id": "the_atlantic",
+    "name": "The Atlantic",
+    "aliases": ["Atlantic Magazine"],
+    "domains": ["theatlantic.com"],
+    "category": "news",
+    "brandColor": "#000000",
+    "logoAssetName": "The_Atlantic"
+  },
+  {
+    "id": "new_yorker",
+    "name": "The New Yorker",
+    "aliases": ["New Yorker Magazine"],
+    "domains": ["newyorker.com"],
+    "category": "news",
+    "brandColor": "#000000",
+    "logoAssetName": "The_New_Yorker"
+  },
+  {
+    "id": "wired",
+    "name": "Wired",
+    "aliases": ["Wired Magazine"],
+    "domains": ["wired.com"],
+    "category": "news",
+    "brandColor": "#000000",
+    "logoAssetName": "Wired"
+  },
+  {
+    "id": "nike_training",
+    "name": "Nike Training Club",
+    "aliases": ["NTC", "Nike Training"],
+    "domains": ["nike.com"],
+    "category": "fitness",
+    "brandColor": "#000000",
+    "logoAssetName": "Nike_Training_Club"
+  },
+  {
+    "id": "whoop",
+    "name": "WHOOP",
+    "aliases": ["Whoop Fitness"],
+    "domains": ["whoop.com"],
+    "category": "fitness",
+    "brandColor": "#44D7B6",
+    "logoAssetName": "WHOOP"
+  },
+  {
+    "id": "oura",
+    "name": "Oura",
+    "aliases": ["Oura Ring", "Oura Membership"],
+    "domains": ["ouraring.com"],
+    "category": "fitness",
+    "brandColor": "#000000",
+    "logoAssetName": "Oura"
+  },
+  {
+    "id": "classpass",
+    "name": "ClassPass",
+    "aliases": ["Class Pass"],
+    "domains": ["classpass.com"],
+    "category": "fitness",
+    "brandColor": "#0047FF",
+    "logoAssetName": "ClassPass"
+  },
+  {
+    "id": "noom",
+    "name": "Noom",
+    "aliases": ["Noom Weight"],
+    "domains": ["noom.com"],
+    "category": "fitness",
+    "brandColor": "#FF6B00",
+    "logoAssetName": "Noom"
+  },
+  {
+    "id": "betterhelp",
+    "name": "BetterHelp",
+    "aliases": ["Better Help"],
+    "domains": ["betterhelp.com"],
+    "category": "fitness",
+    "brandColor": "#00A693",
+    "logoAssetName": "BetterHelp"
+  },
+  {
+    "id": "talkspace",
+    "name": "Talkspace",
+    "aliases": ["Talk Space"],
+    "domains": ["talkspace.com"],
+    "category": "fitness",
+    "brandColor": "#00B4A2",
+    "logoAssetName": "Talkspace"
+  },
+  {
+    "id": "reddit_premium",
+    "name": "Reddit Premium",
+    "aliases": ["Reddit Gold"],
+    "domains": ["reddit.com"],
+    "category": "social",
+    "brandColor": "#FF4500",
+    "logoAssetName": "Reddit_Premium"
+  },
+  {
+    "id": "snapchat_plus",
+    "name": "Snapchat+",
+    "aliases": ["Snapchat Plus"],
+    "domains": ["snapchat.com"],
+    "category": "social",
+    "brandColor": "#FFFC00",
+    "logoAssetName": "Snapchat_"
+  },
+  {
+    "id": "patreon",
+    "name": "Patreon",
+    "aliases": ["Patreon Membership"],
+    "domains": ["patreon.com"],
+    "category": "social",
+    "brandColor": "#FF424D",
+    "logoAssetName": "Patreon"
+  },
+  {
+    "id": "ynab",
+    "name": "YNAB",
+    "aliases": ["You Need A Budget"],
+    "domains": ["ynab.com"],
+    "category": "other",
+    "brandColor": "#85C0EA",
+    "logoAssetName": "YNAB"
+  },
+  {
+    "id": "copilot_money",
+    "name": "Copilot",
+    "aliases": ["Copilot Money", "Copilot Finance"],
+    "domains": ["copilot.money"],
+    "category": "other",
+    "brandColor": "#000000",
+    "logoAssetName": "Copilot"
+  },
+  {
+    "id": "monarch",
+    "name": "Monarch Money",
+    "aliases": ["Monarch", "Monarch Finance"],
+    "domains": ["monarchmoney.com"],
+    "category": "other",
+    "brandColor": "#5046E5",
+    "logoAssetName": "Monarch_Money"
+  },
+  {
+    "id": "robinhood_gold",
+    "name": "Robinhood Gold",
+    "aliases": ["Robinhood"],
+    "domains": ["robinhood.com"],
+    "category": "other",
+    "brandColor": "#00C805",
+    "logoAssetName": "Robinhood_Gold"
+  },
+  {
+    "id": "geforce_now",
+    "name": "GeForce NOW",
+    "aliases": ["Nvidia GeForce Now", "GFN"],
+    "domains": ["nvidia.com"],
+    "category": "gaming",
+    "brandColor": "#76B900",
+    "logoAssetName": "GeForce_NOW"
+  },
+  {
+    "id": "ubisoft_plus",
+    "name": "Ubisoft+",
+    "aliases": ["Ubisoft Plus"],
+    "domains": ["ubisoft.com"],
+    "category": "gaming",
+    "brandColor": "#000000",
+    "logoAssetName": "Ubisoft_"
+  },
+  {
+    "id": "steam",
+    "name": "Steam",
+    "aliases": ["Valve Steam"],
+    "domains": ["steampowered.com"],
+    "category": "gaming",
+    "brandColor": "#1B2838",
+    "logoAssetName": "Steam"
+  },
+  {
+    "id": "hello_fresh",
+    "name": "HelloFresh",
+    "aliases": ["Hello Fresh"],
+    "domains": ["hellofresh.com"],
+    "category": "food",
+    "brandColor": "#94C11E",
+    "logoAssetName": "HelloFresh"
+  },
+  {
+    "id": "blue_apron",
+    "name": "Blue Apron",
+    "aliases": ["BlueApron"],
+    "domains": ["blueapron.com"],
+    "category": "food",
+    "brandColor": "#0066CC",
+    "logoAssetName": "Blue_Apron"
+  },
+  {
+    "id": "shipt",
+    "name": "Shipt",
+    "aliases": ["Shipt Delivery"],
+    "domains": ["shipt.com"],
+    "category": "food",
+    "brandColor": "#17B471",
+    "logoAssetName": "Shipt"
+  },
+  {
+    "id": "squarespace",
+    "name": "Squarespace",
+    "aliases": ["Squarespace Websites"],
+    "domains": ["squarespace.com"],
+    "category": "productivity",
+    "brandColor": "#000000",
+    "logoAssetName": "Squarespace"
+  },
+  {
+    "id": "wix",
+    "name": "Wix",
+    "aliases": ["Wix Premium"],
+    "domains": ["wix.com"],
+    "category": "productivity",
+    "brandColor": "#000000",
+    "logoAssetName": "Wix"
+  },
+  {
+    "id": "shopify",
+    "name": "Shopify",
+    "aliases": ["Shopify Basic", "Shopify Plus"],
+    "domains": ["shopify.com"],
+    "category": "productivity",
+    "brandColor": "#96BF48",
+    "logoAssetName": "Shopify"
+  },
+  {
+    "id": "mailchimp",
+    "name": "Mailchimp",
+    "aliases": ["Mail Chimp"],
+    "domains": ["mailchimp.com"],
+    "category": "productivity",
+    "brandColor": "#FFE01B",
+    "logoAssetName": "Mailchimp"
+  },
+  {
+    "id": "hubspot",
+    "name": "HubSpot",
+    "aliases": ["Hub Spot"],
+    "domains": ["hubspot.com"],
+    "category": "productivity",
+    "brandColor": "#FF7A59",
+    "logoAssetName": "HubSpot"
+  },
+  {
+    "id": "stripe",
+    "name": "Stripe",
+    "aliases": ["Stripe Payments"],
+    "domains": ["stripe.com"],
+    "category": "other",
+    "brandColor": "#635BFF",
+    "logoAssetName": "Stripe"
+  },
+  {
+    "id": "twilio",
+    "name": "Twilio",
+    "aliases": ["Twilio Communications"],
+    "domains": ["twilio.com"],
+    "category": "productivity",
+    "brandColor": "#F22F46",
+    "logoAssetName": "Twilio"
+  },
+  {
+    "id": "datadog",
+    "name": "Datadog",
+    "aliases": ["Data Dog"],
+    "domains": ["datadoghq.com"],
+    "category": "productivity",
+    "brandColor": "#632CA6",
+    "logoAssetName": "Datadog"
+  },
+  {
+    "id": "sentry",
+    "name": "Sentry",
+    "aliases": ["Sentry.io"],
+    "domains": ["sentry.io"],
+    "category": "productivity",
+    "brandColor": "#362D59",
+    "logoAssetName": "Sentry"
+  },
+  {
+    "id": "new_relic",
+    "name": "New Relic",
+    "aliases": ["NewRelic"],
+    "domains": ["newrelic.com"],
+    "category": "productivity",
+    "brandColor": "#00AC69",
+    "logoAssetName": "New_Relic"
+  },
+  {
+    "id": "atlassian",
+    "name": "Atlassian",
+    "aliases": ["Atlassian Cloud", "Jira", "Confluence"],
+    "domains": ["atlassian.com"],
+    "category": "productivity",
+    "brandColor": "#0052CC",
+    "logoAssetName": "Atlassian"
+  },
+  {
+    "id": "jira",
+    "name": "Jira",
+    "aliases": ["Jira Software", "Jira Cloud"],
+    "domains": ["atlassian.com"],
+    "category": "productivity",
+    "brandColor": "#0052CC",
+    "logoAssetName": "Jira"
+  },
+  {
+    "id": "confluence",
+    "name": "Confluence",
+    "aliases": ["Atlassian Confluence"],
+    "domains": ["atlassian.com"],
+    "category": "productivity",
+    "brandColor": "#172B4D",
+    "logoAssetName": "Confluence"
+  },
+  {
+    "id": "bitbucket",
+    "name": "Bitbucket",
+    "aliases": ["Atlassian Bitbucket"],
+    "domains": ["bitbucket.org"],
+    "category": "productivity",
+    "brandColor": "#0052CC",
+    "logoAssetName": "Bitbucket"
+  },
+  {
+    "id": "postman",
+    "name": "Postman",
+    "aliases": ["Postman API"],
+    "domains": ["postman.com"],
+    "category": "productivity",
+    "brandColor": "#FF6C37",
+    "logoAssetName": "Postman"
+  },
+  {
+    "id": "intercom",
+    "name": "Intercom",
+    "aliases": ["Intercom Support"],
+    "domains": ["intercom.com"],
+    "category": "productivity",
+    "brandColor": "#1F8DED",
+    "logoAssetName": "Intercom"
+  },
+  {
+    "id": "zendesk",
+    "name": "Zendesk",
+    "aliases": ["Zendesk Support"],
+    "domains": ["zendesk.com"],
+    "category": "productivity",
+    "brandColor": "#03363D",
+    "logoAssetName": "Zendesk"
+  },
+  {
+    "id": "freshdesk",
+    "name": "Freshdesk",
+    "aliases": ["Freshworks"],
+    "domains": ["freshdesk.com"],
+    "category": "productivity",
+    "brandColor": "#00A651",
+    "logoAssetName": "Freshdesk"
+  },
+  {
+    "id": "typeform",
+    "name": "Typeform",
+    "aliases": ["Typeform Surveys"],
+    "domains": ["typeform.com"],
+    "category": "productivity",
+    "brandColor": "#262627",
+    "logoAssetName": "Typeform"
+  },
+  {
+    "id": "surveymonkey",
+    "name": "SurveyMonkey",
+    "aliases": ["Survey Monkey"],
+    "domains": ["surveymonkey.com"],
+    "category": "productivity",
+    "brandColor": "#00BF6F",
+    "logoAssetName": "SurveyMonkey"
+  },
+  {
+    "id": "docusign",
+    "name": "DocuSign",
+    "aliases": ["Docu Sign"],
+    "domains": ["docusign.com"],
+    "category": "productivity",
+    "brandColor": "#FFD02E",
+    "logoAssetName": "DocuSign"
+  },
+  {
+    "id": "dropbox_sign",
+    "name": "Dropbox Sign",
+    "aliases": ["HelloSign"],
+    "domains": ["hellosign.com"],
+    "category": "productivity",
+    "brandColor": "#0061FF",
+    "logoAssetName": "Dropbox_Sign"
+  },
+  {
+    "id": "1password_business",
+    "name": "1Password Business",
+    "aliases": ["1Password Teams"],
+    "domains": ["1password.com"],
+    "category": "vpn",
+    "brandColor": "#0094F5",
+    "logoAssetName": "1Password_Business"
+  },
+  {
+    "id": "okta",
+    "name": "Okta",
+    "aliases": ["Okta Identity"],
+    "domains": ["okta.com"],
+    "category": "productivity",
+    "brandColor": "#007DC1",
+    "logoAssetName": "Okta"
+  },
+  {
+    "id": "auth0",
+    "name": "Auth0",
+    "aliases": ["Auth Zero"],
+    "domains": ["auth0.com"],
+    "category": "productivity",
+    "brandColor": "#EB5424",
+    "logoAssetName": "Auth0"
   }
 ]

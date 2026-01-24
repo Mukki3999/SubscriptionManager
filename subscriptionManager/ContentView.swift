@@ -17,8 +17,19 @@ enum AppScreen {
 
 struct ContentView: View {
 
-    @State private var currentScreen: AppScreen = .onboarding
+    @State private var currentScreen: AppScreen
     @State private var showHome = false
+    @State private var inboxManualEntry = false
+
+    private let subscriptionsKey = "confirmedSubscriptions"
+    private let accountsStorageKey = "connectedAccounts"
+
+    init() {
+        _currentScreen = State(initialValue: Self.determineInitialScreen(
+            subscriptionsKey: "confirmedSubscriptions",
+            accountsStorageKey: "connectedAccounts"
+        ))
+    }
 
     var body: some View {
         ZStack {
@@ -36,18 +47,24 @@ struct ContentView: View {
             case .accountConnection:
                 AccountConnectionView(
                     onContinue: {
+                        inboxManualEntry = false
+                        currentScreen = .inbox
+                    },
+                    onAddManually: {
+                        inboxManualEntry = true
                         currentScreen = .inbox
                     }
                 )
                 .transition(.opacity)
 
             case .inbox:
-                InboxFlowView(showHome: $showHome)
+                InboxFlowView(showHome: $showHome, isManualEntry: inboxManualEntry)
                     .transition(.move(edge: .trailing))
                     .onChange(of: showHome) { _, newValue in
                         if newValue {
                             withAnimation {
                                 currentScreen = .home
+                                inboxManualEntry = false
                             }
                         }
                     }
@@ -58,6 +75,36 @@ struct ContentView: View {
             }
         }
         .animation(.easeInOut(duration: 0.3), value: currentScreen)
+    }
+
+    // MARK: - Initial Screen Selection
+
+    private static func determineInitialScreen(subscriptionsKey: String, accountsStorageKey: String) -> AppScreen {
+        if hasSavedSubscriptions(subscriptionsKey: subscriptionsKey) {
+            return .home
+        }
+
+        if hasConnectedAccounts(accountsStorageKey: accountsStorageKey) {
+            return .inbox
+        }
+
+        return .onboarding
+    }
+
+    private static func hasSavedSubscriptions(subscriptionsKey: String) -> Bool {
+        guard let data = UserDefaults.standard.data(forKey: subscriptionsKey),
+              let subscriptions = try? JSONDecoder().decode([Subscription].self, from: data) else {
+            return false
+        }
+        return !subscriptions.isEmpty
+    }
+
+    private static func hasConnectedAccounts(accountsStorageKey: String) -> Bool {
+        guard let data = UserDefaults.standard.data(forKey: accountsStorageKey),
+              let accounts = try? JSONDecoder().decode([ConnectedAccount].self, from: data) else {
+            return false
+        }
+        return !accounts.isEmpty
     }
 }
 

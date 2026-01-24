@@ -1,0 +1,6 @@
+.DS_Store
+**/.DS_Store
+subscriptionManager.xcodeproj/xcuserdata/
+
+# Local scripts with secrets
+download_logos.sh

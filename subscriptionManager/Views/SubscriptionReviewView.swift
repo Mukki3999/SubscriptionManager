@@ -13,11 +13,15 @@ struct SubscriptionReviewView: View {
     @ObservedObject var viewModel: InboxViewModel
     let onComplete: () -> Void
 
-    @State private var editingSubscription: Subscription?
+    @StateObject private var companyService = CompanyLogoService.shared
+    @State private var selectedSubscription: Subscription?
     @State private var showingAddSheet = false
-    @State private var appeared = false
+    @State private var showAddCallout = false
+
+    private let addCalloutKey = "review.hasSeenAddCallout"
 
     var body: some View {
+        let _ = companyService.isLoaded
         ZStack {
             LinearGradient(
                 colors: [
@@ -34,8 +38,6 @@ struct SubscriptionReviewView: View {
                 headerSection
                     .padding(.horizontal, 24)
                     .padding(.top, 16)
-                    .offset(y: appeared ? 0 : 20)
-                    .opacity(appeared ? 1 : 0)
 
                 // Subscription list
                 ScrollView(showsIndicators: false) {
@@ -44,8 +46,6 @@ struct SubscriptionReviewView: View {
                         summaryCard
                             .padding(.horizontal, 24)
                             .padding(.top, 16)
-                            .offset(y: appeared ? 0 : 20)
-                            .opacity(appeared ? 1 : 0)
 
                         // High confidence section
                         if !viewModel.highConfidenceSubscriptions.isEmpty {
@@ -53,18 +53,8 @@ struct SubscriptionReviewView: View {
                                 .padding(.horizontal, 24)
                                 .padding(.top, 8)
 
-                            ForEach(Array(viewModel.highConfidenceSubscriptions.enumerated()), id: \.element.id) { index, subscription in
-                                PremiumSubscriptionCard(
-                                    subscription: subscription,
-                                    iconInfo: viewModel.getIconInfo(for: subscription),
-                                    onEdit: { editingSubscription = subscription },
-                                    onRemove: { viewModel.removeSubscription(subscription) }
-                                )
-                                .padding(.horizontal, 24)
-                                .offset(y: appeared ? 0 : 30)
-                                .opacity(appeared ? 1 : 0)
-                                .animation(.spring(response: 0.6, dampingFraction: 0.8).delay(Double(index) * 0.05 + 0.2), value: appeared)
-                            }
+                            stackedCards(viewModel.highConfidenceSubscriptions)
+                                .padding(.horizontal, 12)
                         }
 
                         // Medium/Low confidence section
@@ -73,18 +63,8 @@ struct SubscriptionReviewView: View {
                                 .padding(.horizontal, 24)
                                 .padding(.top, 8)
 
-                            ForEach(Array(viewModel.mediumConfidenceSubscriptions.enumerated()), id: \.element.id) { index, subscription in
-                                PremiumSubscriptionCard(
-                                    subscription: subscription,
-                                    iconInfo: viewModel.getIconInfo(for: subscription),
-                                    onEdit: { editingSubscription = subscription },
-                                    onRemove: { viewModel.removeSubscription(subscription) }
-                                )
-                                .padding(.horizontal, 24)
-                                .offset(y: appeared ? 0 : 30)
-                                .opacity(appeared ? 1 : 0)
-                                .animation(.spring(response: 0.6, dampingFraction: 0.8).delay(Double(index) * 0.05 + 0.3), value: appeared)
-                            }
+                            stackedCards(viewModel.mediumConfidenceSubscriptions)
+                                .padding(.horizontal, 12)
                         }
 
                         // Empty state
@@ -108,26 +88,34 @@ struct SubscriptionReviewView: View {
             }
         }
         .onAppear {
-            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
-                appeared = true
+            if viewModel.subscriptions.isEmpty,
+               !UserDefaults.standard.bool(forKey: addCalloutKey) {
+                showAddCallout = true
             }
         }
-        .sheet(item: $editingSubscription) { subscription in
-            PremiumEditSubscriptionSheet(
+        .sheet(item: $selectedSubscription) { subscription in
+            SubscriptionDetailView(
                 subscription: subscription,
-                onSave: { name, price, cycle in
-                    viewModel.updateSubscription(subscription, name: name, price: price, cycle: cycle)
-                    editingSubscription = nil
-                },
-                onCancel: { editingSubscription = nil }
+                logoImage: subscriptionLogoImage(for: subscription),
+                cardColor: cardColor(for: subscription.id),
+                showsCancellationSection: false,
+                showsFromRow: false,
+                showsManageButton: false,
+                onDelete: {
+                    viewModel.removeSubscription(subscription)
+                }
             )
-            .presentationDetents([.medium])
-            .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $showingAddSheet) {
-            AddSubscriptionView { subscription in
-                viewModel.addSubscription(subscription)
-            }
+            AddSubscriptionView(
+                onSubscriptionAdded: { subscription in
+                    viewModel.addSubscription(subscription)
+                    UserDefaults.standard.set(true, forKey: addCalloutKey)
+                    showAddCallout = false
+                },
+                currentSubscriptionCount: viewModel.subscriptions.count,
+                previewCardColor: SubscriptionCardColors.color(for: viewModel.subscriptions.count)
+            )
         }
     }
 
@@ -143,7 +131,11 @@ struct SubscriptionReviewView: View {
                 Spacer()
 
                 // Add button
-                Button(action: { showingAddSheet = true }) {
+                Button(action: {
+                    showingAddSheet = true
+                    UserDefaults.standard.set(true, forKey: addCalloutKey)
+                    showAddCallout = false
+                }) {
                     Image(systemName: "plus")
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundColor(.white)
@@ -162,6 +154,13 @@ struct SubscriptionReviewView: View {
                 .foregroundColor(Color(white: 0.6))
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .overlay(alignment: .topTrailing) {
+            if showAddCallout {
+                addCallout
+                    .offset(x: 0, y: 44)
+                    .zIndex(2)
+            }
+        }
     }
 
     // MARK: - Summary Card
@@ -256,8 +255,42 @@ struct SubscriptionReviewView: View {
                     )
             }
             .buttonStyle(PlainButtonStyle())
+            .simultaneousGesture(TapGesture().onEnded {
+                UserDefaults.standard.set(true, forKey: addCalloutKey)
+                showAddCallout = false
+            })
             .padding(.top, 4)
         }
+    }
+
+    private var addCallout: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Please add missing subscriptions manually.")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(Color.black.opacity(0.85))
+                .multilineTextAlignment(.leading)
+                .lineLimit(nil)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .frame(width: 220, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(Color.white)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .stroke(Color.black.opacity(0.08), lineWidth: 1)
+                )
+        )
+        .overlay(
+            Triangle()
+                .fill(Color.white)
+                .frame(width: 14, height: 9)
+                .offset(x: -10, y: -6),
+            alignment: .topTrailing
+        )
+        .shadow(color: Color.black.opacity(0.18), radius: 10, x: 0, y: 6)
     }
 
     // MARK: - Done Button
@@ -297,6 +330,40 @@ struct SubscriptionReviewView: View {
         formatter.currencyCode = "USD"
         return formatter.string(from: NSNumber(value: amount)) ?? "$\(amount)"
     }
+
+    private func subscriptionLogoImage(for subscription: Subscription) -> String? {
+        SubscriptionLogoResolver.assetName(for: subscription)
+    }
+
+    private func cardColor(for subscriptionId: UUID) -> Color {
+        let index = viewModel.subscriptions.firstIndex(where: { $0.id == subscriptionId }) ?? 0
+        return SubscriptionCardColors.color(for: index)
+    }
+
+    private func stackedCards(_ subscriptions: [Subscription]) -> some View {
+        let cardHeight: CGFloat = 120
+        let visiblePortion: CGFloat = 106
+
+        return ZStack(alignment: .top) {
+            ForEach(Array(subscriptions.enumerated()), id: \.element.id) { index, subscription in
+                let isLast = index == subscriptions.count - 1
+                SubscriptionListCardView(
+                    subscription: subscription,
+                    backgroundColor: cardColor(for: subscription.id),
+                    logoImage: subscriptionLogoImage(for: subscription),
+                    isLastCard: isLast,
+                    onTap: { selectedSubscription = subscription }
+                )
+                .offset(y: CGFloat(index) * visiblePortion)
+                .zIndex(Double(index))
+            }
+        }
+        .frame(
+            maxWidth: .infinity,
+            minHeight: CGFloat(max(0, subscriptions.count - 1)) * visiblePortion + cardHeight,
+            alignment: .top
+        )
+    }
 }
 
 // MARK: - Brand Logo Mapping
@@ -310,10 +377,10 @@ struct BrandLogoMapper {
         "chatgpt": "OpenAILogo",
         "chatgpt plus": "OpenAILogo",
         "spotify": "SpotifyLogo",
-        "youtube": "YouTubeLogo",
-        "youtube premium": "YouTubeLogo",
-        "youtube music": "YouTubeLogo",
-        "gmail": "GmailLogo"
+        "youtube": "YouTubeLogo 1",
+        "youtube premium": "YouTubeLogo 1",
+        "youtube music": "YouTubeLogo 1",
+        "gmail": "GmailLogo 1"
     ]
 
     /// Get asset image name for a subscription name (case-insensitive)
@@ -612,6 +679,17 @@ struct PremiumEditSubscriptionSheet: View {
             }
         }
         .preferredColorScheme(.dark)
+    }
+}
+
+private struct Triangle: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.midX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
+        path.closeSubpath()
+        return path
     }
 }
 

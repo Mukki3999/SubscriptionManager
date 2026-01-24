@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		36B9923B2F1F665F0057246C /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 36B9923A2F1F665F0057246C /* FirebaseAnalytics */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		368559A52F1625A1004C1868 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				36B9923B2F1F665F0057246C /* FirebaseAnalytics in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +117,7 @@
 			);
 			name = subscriptionManager;
 			packageProductDependencies = (
+				36B9923A2F1F665F0057246C /* FirebaseAnalytics */,
 			);
 			productName = subscriptionManager;
 			productReference = 368559972F16259E004C1868 /* subscriptionManager.app */;
@@ -195,6 +201,9 @@
 			);
 			mainGroup = 3685598E2F16259E004C1868;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				36B992392F1F665F0057246C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 368559982F16259E004C1868 /* Products */;
 			projectDirPath = "";
@@ -560,6 +569,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		36B992392F1F665F0057246C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.8.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		36B9923A2F1F665F0057246C /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 36B992392F1F665F0057246C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 3685598F2F16259E004C1868 /* Project object */;
 }

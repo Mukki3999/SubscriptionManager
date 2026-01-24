@@ -50,16 +50,20 @@ struct HomeView: View {
 
     // MARK: - State
 
+    @StateObject private var companyService = CompanyLogoService.shared
     @StateObject private var viewModel = HomeViewModel()
     @StateObject private var notificationViewModel = NotificationViewModel()
     @State private var isBalanceHidden = false
-    @State private var userName = "Patricia"
+    @State private var userName = ""
     @FocusState private var isNameFocused: Bool
     @State private var selectedPhotoItem: PhotosPickerItem?
     @State private var profileImageData: Data?
     @State private var showAddSubscription = false
     @State private var showNotifications = false
     @State private var selectedSubscription: Subscription?
+    @State private var showInsights = false
+    @State private var showInsightsPaywall = false
+    @State private var showAllUpcomingBills = false
     @GestureState private var dragState: DragState = .inactive
 
     // MARK: - Constants
@@ -69,10 +73,12 @@ struct HomeView: View {
     private let mintBackground = Color(red: 0.78, green: 0.93, blue: 0.87)
     private let profileNameKey = "userProfile.name"
     private let profileImageKey = "userProfile.imageData"
+    private let hasSeenNameCalloutKey = "userProfile.hasSeenNameCallout"
 
     // MARK: - Body
 
     var body: some View {
+        let _ = companyService.isLoaded
         NavigationStack {
             ZStack {
                 // Solid dark background that extends full screen
@@ -88,20 +94,31 @@ struct HomeView: View {
                         mintSection
                     }
                 }
+                .scrollDisabled(dragState.isDragging)
             }
             .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(isPresented: $showAddSubscription) {
-                AddSubscriptionView { subscription in
-                    viewModel.addSubscription(subscription)
-                }
+                AddSubscriptionView(
+                    onSubscriptionAdded: { subscription in
+                        viewModel.addSubscription(subscription)
+                    },
+                    currentSubscriptionCount: viewModel.subscriptionCount,
+                    previewCardColor: viewModel.nextAvailableCardColor()
+                )
             }
             .onAppear {
+                AnalyticsService.screen("home")
                 viewModel.loadSubscriptions()
                 loadProfile()
                 notificationViewModel.loadNotifications()
             }
             .onChange(of: userName) { newValue in
-                UserDefaults.standard.set(newValue, forKey: profileNameKey)
+                let trimmed = newValue.trimmingCharacters(in: .whitespacesAndNewlines)
+                if trimmed.isEmpty {
+                    UserDefaults.standard.removeObject(forKey: profileNameKey)
+                } else {
+                    UserDefaults.standard.set(trimmed, forKey: profileNameKey)
+                }
             }
             .onChange(of: showNotifications) { isShowing in
                 if !isShowing {
@@ -130,10 +147,36 @@ struct HomeView: View {
             .sheet(item: $selectedSubscription) { subscription in
                 SubscriptionDetailView(
                     subscription: subscription,
-                    logoImage: subscriptionLogoImage(for: subscription.name),
+                    logoImage: subscriptionLogoImage(for: subscription),
                     cardColor: cardColorForSubscription(subscription),
                     onDelete: {
                         viewModel.deleteSubscription(subscription)
+                    }
+                )
+            }
+            .navigationDestination(isPresented: $showInsights) {
+                InsightsView(
+                    subscriptions: viewModel.allSubscriptions,
+                    colorIndices: viewModel.colorIndices
+                )
+            }
+            .fullScreenCover(isPresented: $showInsightsPaywall) {
+                PaywallView(
+                    trigger: .featureGate("Insights"),
+                    onPurchaseSuccess: {
+                        showInsights = true
+                    }
+                )
+            }
+            .sheet(isPresented: $showAllUpcomingBills) {
+                AllUpcomingBillsView(
+                    subscriptions: viewModel.allSubscriptions,
+                    colorIndices: viewModel.colorIndices,
+                    onSelectSubscription: { subscription in
+                        showAllUpcomingBills = false
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            selectedSubscription = subscription
+                        }
                     }
                 )
             }
@@ -152,11 +195,22 @@ struct HomeView: View {
                 .padding(.horizontal, horizontalPadding)
                 .padding(.bottom, 24)
 
-            // Balance card
+            // Balance card with integrated donut chart
             BalanceCardView(
                 balance: displayBalance,
                 billingDate: viewModel.billingPeriodEnd,
-                isBalanceHidden: $isBalanceHidden
+                isBalanceHidden: $isBalanceHidden,
+                chartItems: buildChartItems(),
+                isPro: TierManager.shared.currentTier.canViewInsights,
+                onChartTap: {
+                    AnalyticsService.event("spending_chart_tapped")
+                    if TierManager.shared.currentTier.canViewInsights {
+                        showInsights = true
+                    } else {
+                        showInsights = false
+                        showInsightsPaywall = true
+                    }
+                }
             )
             .padding(.horizontal, horizontalPadding)
             .padding(.bottom, 28)
@@ -167,76 +221,146 @@ struct HomeView: View {
         }
     }
 
+    // MARK: - Chart Data Builder
+
+    /// Builds chart segments from current subscriptions for the donut chart.
+    /// Each subscription becomes a segment proportional to its monthly spend.
+    private func buildChartItems() -> [LogoDonutItem] {
+        let subscriptions = viewModel.allSubscriptions
+
+        return subscriptions.map { sub in
+            let monthlyValue: Double
+            switch sub.billingCycle {
+            case .weekly:
+                monthlyValue = sub.price * 4.33
+            case .monthly:
+                monthlyValue = sub.price
+            case .quarterly:
+                monthlyValue = sub.price / 3
+            case .yearly:
+                monthlyValue = sub.price / 12
+            case .unknown:
+                monthlyValue = sub.price
+            }
+
+            let colorIndex = viewModel.colorIndex(for: sub.id)
+            return LogoDonutItem(
+                id: sub.id,
+                name: sub.name,
+                value: monthlyValue,
+                color: SubscriptionCardColors.color(for: colorIndex),
+                logoName: subscriptionLogoImage(for: sub)
+            )
+        }
+    }
+
     // MARK: - Greeting Row
 
     private var greetingRow: some View {
-        HStack(spacing: 12) {
-            PhotosPicker(selection: $selectedPhotoItem, matching: .images, photoLibrary: .shared()) {
-                profileAvatar
-            }
-            .buttonStyle(.plain)
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 12) {
+                PhotosPicker(selection: $selectedPhotoItem, matching: .images, photoLibrary: .shared()) {
+                    profileAvatar
+                }
+                .buttonStyle(.plain)
 
-            // Greeting text
-            Text("Hello, ")
-                .font(.system(size: 20, weight: .regular))
-                .foregroundColor(.white)
+                HStack(spacing: 6) {
+                    Text("Hello,")
+                        .font(.system(size: 20, weight: .regular))
+                        .foregroundColor(.white)
 
-            VStack(alignment: .leading, spacing: 4) {
-                TextField("Your name", text: $userName)
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundColor(.white)
-                    .focused($isNameFocused)
-                    .textFieldStyle(.plain)
-                    .submitLabel(.done)
-                    .onSubmit { isNameFocused = false }
-                    .autocorrectionDisabled()
-                    .textInputAutocapitalization(.words)
+                    VStack(alignment: .leading, spacing: 4) {
+                        TextField("", text: $userName)
+                            .font(.system(size: 20, weight: .semibold))
+                            .foregroundColor(.white)
+                            .focused($isNameFocused)
+                            .textFieldStyle(.plain)
+                            .submitLabel(.done)
+                            .onSubmit { isNameFocused = false }
+                            .autocorrectionDisabled()
+                            .textInputAutocapitalization(.words)
 
-                Rectangle()
-                    .fill(Color.white.opacity(isNameFocused ? 0.8 : 0.35))
-                    .frame(height: 1)
-            }
-
-            Button(action: { isNameFocused = true }) {
-                Image(systemName: "pencil")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(.white.opacity(0.8))
-            }
-            .buttonStyle(.plain)
-
-            Spacer()
-
-            // Bell icon with notification badge
-            Button(action: { showNotifications = true }) {
-                ZStack {
-                    Circle()
-                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
-                        .frame(width: 44, height: 44)
-
-                    Image(systemName: "bell")
-                        .font(.system(size: 18))
-                        .foregroundColor(.white.opacity(0.8))
-
-                    // Unread badge
-                    if notificationViewModel.hasUnreadNotifications {
-                        ZStack {
-                            Circle()
-                                .fill(Color.red)
-                                .frame(width: 18, height: 18)
-
-                            Text(notificationViewModel.unreadCount > 9 ? "9+" : "\(notificationViewModel.unreadCount)")
-                                .font(.system(size: 10, weight: .bold))
-                                .foregroundColor(.white)
-                        }
-                        .offset(x: 14, y: -14)
+                        Rectangle()
+                            .fill(Color.white.opacity(isNameFocused ? 0.8 : 0.35))
+                            .frame(height: 1)
                     }
                 }
+
+                Button(action: { isNameFocused = true }) {
+                    Image(systemName: "pencil")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(.white.opacity(0.8))
+                }
+                .buttonStyle(.plain)
+
+                Spacer()
+
+                // Bell icon with notification badge
+                Button(action: { showNotifications = true }) {
+                    ZStack {
+                        Circle()
+                            .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                            .frame(width: 44, height: 44)
+
+                        Image(systemName: "bell")
+                            .font(.system(size: 18))
+                            .foregroundColor(.white.opacity(0.8))
+
+                        // Unread badge
+                        if notificationViewModel.hasUnreadNotifications {
+                            ZStack {
+                                Circle()
+                                    .fill(Color.red)
+                                    .frame(width: 18, height: 18)
+
+                                Text(notificationViewModel.unreadCount > 9 ? "9+" : "\(notificationViewModel.unreadCount)")
+                                    .font(.system(size: 10, weight: .bold))
+                                    .foregroundColor(.white)
+                            }
+                            .offset(x: 14, y: -14)
+                        }
+                    }
+                }
+                .buttonStyle(.plain)
+                .sheet(isPresented: $showNotifications) {
+                    NotificationsView(viewModel: notificationViewModel)
+                }
             }
-            .buttonStyle(.plain)
-            .sheet(isPresented: $showNotifications) {
-                NotificationsView(viewModel: notificationViewModel)
+
+            if userName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+               !UserDefaults.standard.bool(forKey: hasSeenNameCalloutKey) {
+                namePromptCallout
+                    .padding(.leading, 60)
             }
         }
+        .onChange(of: userName) { newValue in
+            let trimmed = newValue.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !trimmed.isEmpty {
+                UserDefaults.standard.set(true, forKey: hasSeenNameCalloutKey)
+            }
+        }
+    }
+
+    private var namePromptCallout: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("What should we call you?")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(Color.black.opacity(0.8))
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(Color.white)
+        )
+        .overlay(
+            Triangle()
+                .fill(Color.white)
+                .frame(width: 12, height: 8)
+                .offset(x: 18, y: -4),
+            alignment: .topLeading
+        )
+        .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
     }
 
     private var profileAvatar: some View {
@@ -315,7 +439,7 @@ struct HomeView: View {
                         subscription: bill,
                         backgroundColor: upcomingCardColor(for: index, bill: bill),
                         daysLeft: bill.daysUntilNextBilling ?? 12,
-                        logoImage: subscriptionLogoImage(for: bill.displayName)
+                        logoImage: subscriptionLogoImage(for: bill)
                     )
                     .onTapGesture {
                         if let original = bill.originalSubscription {
@@ -439,7 +563,7 @@ struct HomeView: View {
                 SubscriptionListCardView(
                     subscription: subscription,
                     backgroundColor: subscriptionCardColor(for: subscription.displayId),
-                    logoImage: subscriptionLogoImage(for: subscription.displayName),
+                    logoImage: subscriptionLogoImage(for: subscription),
                     isLastCard: dynamicIsLastCard,
                     onTap: {
                         // Disable tap during drag
@@ -461,7 +585,7 @@ struct HomeView: View {
                 .zIndex(isBeingDragged ? 1000 : Double(index))
                 .animation(.spring(response: 0.35, dampingFraction: 0.85), value: dragOffset)
                 .animation(.spring(response: 0.35, dampingFraction: 0.85), value: isBeingDragged)
-                .gesture(reorderGesture(for: index))
+                .simultaneousGesture(reorderGesture(for: index))
             }
         }
         .frame(
@@ -471,155 +595,15 @@ struct HomeView: View {
         )
     }
 
-    private func subscriptionLogoImage(for name: String) -> String? {
-        // Try to find company in the logo service by name
-        if let company = CompanyLogoService.shared.findCompany(for: name),
-           let logoAsset = company.logoAssetName {
-            return logoAsset
+    private func subscriptionLogoImage(for subscription: Subscription) -> String? {
+        SubscriptionLogoResolver.assetName(for: subscription)
+    }
+
+    private func subscriptionLogoImage(for subscription: SubscriptionDisplayWrapper) -> String? {
+        if let original = subscription.originalSubscription {
+            return SubscriptionLogoResolver.assetName(for: original)
         }
-
-        // Comprehensive logo map matching all known subscriptions
-        let logoMap: [String: String] = [
-            // Streaming
-            "Netflix": "NetflixLogo",
-            "Disney+": "DisneyPlusLogo",
-            "YouTube Premium": "YouTubeLogo 1",
-            "YouTube": "YouTubeLogo 1",
-            "Hulu": "HuluLogo",
-            "Max": "MaxLogo",
-            "HBO Max": "MaxLogo",
-            "Amazon Prime": "AmazonPrimeLogo",
-            "Apple TV": "AppleTVLogo",
-            "Apple TV+": "AppleTVLogo",
-            "Peacock": "PeacockLogo",
-            "Paramount+": "ParamountPlusLogo",
-            "Crunchyroll": "CrunchyrollLogo",
-
-            // Music
-            "Spotify": "SpotifyLogo 1",
-            "Apple Music": "AppleMusicLogo",
-            "Tidal": "TidalLogo",
-            "Pandora": "PandoraLogo",
-            "Deezer": "DeezerLogo",
-            "SoundCloud": "SoundCloudLogo",
-            "Audible": "AudibleLogo",
-
-            // Productivity
-            "Adobe Creative Cloud": "AdobeLogo",
-            "Adobe": "AdobeLogo",
-            "Figma": "FigmaLogo",
-            "Notion": "NotionLogo",
-            "Slack": "SlackLogo",
-            "Canva": "CanvaLogo",
-            "Microsoft 365": "Microsoft365Logo",
-            "Google Workspace": "GoogleWorkspaceLogo",
-            "Asana": "AsanaLogo",
-            "Trello": "TrelloLogo",
-            "Linear": "LinearLogo",
-            "Todoist": "TodoistLogo",
-            "Evernote": "EvernoteLogo",
-            "Bear": "BearLogo",
-            "Craft": "CraftLogo",
-            "Superhuman": "SuperhumanLogo",
-
-            // Cloud Storage
-            "Dropbox": "DropboxLogo",
-            "iCloud+": "iCloudLogo",
-            "iCloud": "iCloudLogo",
-            "Google One": "GoogleOneLogo",
-
-            // VPN & Security
-            "1Password": "1PasswordLogo",
-            "NordVPN": "NordVPNLogo",
-            "ExpressVPN": "ExpressVPNLogo",
-            "Surfshark": "SurfsharkLogo",
-            "Bitwarden": "BitwardenLogo",
-            "Dashlane": "DashlaneLogo",
-            "LastPass": "LastPassLogo",
-            "Proton": "ProtonLogo",
-
-            // Social
-            "Discord Nitro": "DiscordLogo",
-            "Discord": "DiscordLogo",
-            "LinkedIn Premium": "LinkedInLogo",
-            "LinkedIn": "LinkedInLogo",
-            "X Premium": "XLogo",
-            "Twitter Blue": "XLogo",
-            "Twitch": "TwitchLogo",
-
-            // Gaming
-            "Xbox Game Pass": "XboxLogo",
-            "Xbox": "XboxLogo",
-            "PlayStation Plus": "PlayStationLogo",
-            "PlayStation": "PlayStationLogo",
-            "Nintendo Switch Online": "NintendoLogo",
-            "Nintendo": "NintendoLogo",
-            "EA Play": "EALogo",
-
-            // Fitness
-            "Strava": "StravaLogo",
-            "Headspace": "HeadspaceLogo",
-            "Calm": "CalmLogo",
-            "Peloton": "PelotonLogo",
-            "MyFitnessPal": "MyFitnessPalLogo",
-            "Fitbit": "FitbitLogo",
-
-            // Education
-            "Duolingo Plus": "DuolingoLogo",
-            "Duolingo": "DuolingoLogo",
-            "MasterClass": "MasterClassLogo",
-            "Skillshare": "SkillshareLogo",
-            "Coursera": "CourseraLogo",
-
-            // News & Media
-            "The New York Times": "NYTimesLogo",
-            "NYTimes": "NYTimesLogo",
-            "Medium": "MediumLogo",
-            "The Economist": "EconomistLogo",
-            "Wall Street Journal": "WSJLogo",
-            "WSJ": "WSJLogo",
-            "Washington Post": "WashingtonPostLogo",
-            "Substack": "SubstackLogo",
-
-            // Food & Delivery
-            "DoorDash DashPass": "DoorDashLogo",
-            "DoorDash": "DoorDashLogo",
-            "Uber One": "UberEatsLogo",
-            "Uber Eats": "UberEatsLogo",
-            "Grubhub": "GrubhubLogo",
-            "Instacart": "InstacartLogo",
-
-            // Shopping
-            "Amazon": "AmazonLogo",
-            "Costco": "CostcoLogo",
-            "Walmart+": "WalmartLogo",
-            "Walmart": "WalmartLogo",
-
-            // AI & Tools
-            "ChatGPT Plus": "OpenAILogo",
-            "ChatGPT": "OpenAILogo",
-            "OpenAI": "OpenAILogo",
-            "Claude": "ClaudeLogo",
-            "Anthropic": "ClaudeLogo",
-            "Midjourney": "MidjourneyLogo",
-            "Grammarly": "GrammarlyLogo",
-
-            // Other
-            "Zoom": "ZoomLogo",
-            "GitHub": "GitHubLogo",
-            "GitLab": "GitLabLogo",
-            "Setapp": "SetappLogo",
-            "CleanMyMac": "CleanMyMacLogo",
-            "Parallels": "ParallelsLogo",
-            "Raycast": "RaycastLogo",
-            "Arc": "ArcLogo",
-            "Sketch": "SketchLogo",
-            "Procreate": "ProcreateLogo",
-            "Affinity": "AffinityLogo",
-            "Apple One": "AppleOneLogo",
-            "Kindle Unlimited": "KindleLogo"
-        ]
-        return logoMap[name]
+        return SubscriptionLogoResolver.assetName(for: subscription.displayName)
     }
 
     private func subscriptionCardColor(for subscriptionId: UUID) -> Color {
@@ -635,7 +619,7 @@ struct HomeView: View {
     // MARK: - View All Button
 
     private func viewAllButton(lightStyle: Bool) -> some View {
-        Button(action: {}) {
+        Button(action: { showAllUpcomingBills = true }) {
             Text("View All")
                 .font(.system(size: 12, weight: .medium))
                 .foregroundColor(lightStyle ? .black : .white)
@@ -690,13 +674,13 @@ struct HomeView: View {
     // MARK: - Drag Reorder Gesture
 
     private func reorderGesture(for index: Int) -> some Gesture {
-        let longPress = LongPressGesture(minimumDuration: 0.5)
+        let longPress = LongPressGesture(minimumDuration: 0.35, maximumDistance: 20)
             .onEnded { _ in
                 let generator = UIImpactFeedbackGenerator(style: .medium)
                 generator.impactOccurred()
             }
 
-        let drag = DragGesture()
+        let drag = DragGesture(minimumDistance: 4)
             .onEnded { value in
                 let visiblePortion: CGFloat = 106
                 let targetIndex = calculateTargetIndex(from: index, translation: value.translation.height, visiblePortion: visiblePortion)
@@ -788,6 +772,17 @@ struct HomeView: View {
         }
 
         return effectiveIndex == lastIndex
+    }
+}
+
+private struct Triangle: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.midX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
+        path.closeSubpath()
+        return path
     }
 }
 

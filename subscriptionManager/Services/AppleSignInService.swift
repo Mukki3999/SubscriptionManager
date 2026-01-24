@@ -83,7 +83,7 @@ extension AppleSignInService: ASAuthorizationControllerDelegate {
             let account = ConnectedAccount(
                 email: email,
                 provider: .apple,
-                accessToken: tokenString,
+                accessToken: "",
                 refreshToken: nil,
                 expiresAt: Date().addingTimeInterval(TimeInterval(3600 * 24 * 30)) // 30 days
             )

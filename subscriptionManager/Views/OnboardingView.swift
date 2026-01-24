@@ -553,10 +553,14 @@ struct OnboardingView: View {
 
                     Button(action: {
                         if currentPage < totalPages - 1 {
+                            AnalyticsService.event("onboarding_next_tapped", params: [
+                                "from_page": currentPage + 1
+                            ])
                             withAnimation {
                                 currentPage += 1
                             }
                         } else {
+                            AnalyticsService.event("onboarding_completed")
                             onGetStarted()
                         }
                     }) {
@@ -579,9 +583,21 @@ struct OnboardingView: View {
             }
         }
         .onAppear {
+            AnalyticsService.event("onboarding_started")
+            AnalyticsService.event("onboarding_step_viewed", params: [
+                "page": 1
+            ])
+            AnalyticsService.screen("onboarding_page_1")
             withAnimation(.spring(response: 0.6, dampingFraction: 0.8).delay(0.6)) {
                 buttonAppeared = true
             }
+        }
+        .onChange(of: currentPage) { _, newValue in
+            let pageNumber = newValue + 1
+            AnalyticsService.event("onboarding_step_viewed", params: [
+                "page": pageNumber
+            ])
+            AnalyticsService.screen("onboarding_page_\(pageNumber)")
         }
     }
 }
