@@ -120,6 +120,7 @@ final class InboxViewModel: ObservableObject {
             phase: .starting,
             emailsScanned: 0,
             candidatesFound: 0,
+            hasGmailAccount: hasGmailAccount,
             storeKitPhase: hasStoreKitAccess ? .notStarted : .unavailable,
             transactionsScanned: 0,
             storeKitCandidatesFound: 0

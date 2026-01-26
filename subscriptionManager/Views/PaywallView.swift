@@ -182,9 +182,9 @@ struct PaywallView: View {
                     }
 
                     HStack(spacing: 16) {
-                        Link("Terms", destination: URL(string: "https://example.com/terms")!)
+                        Link("Terms", destination: URL(string: "https://sparkly-flat-825.notion.site/Terms-of-Service-Trackit-2f3c24ebe50e80b8a67acfe3310d31d4")!)
                         Text("•")
-                        Link("Privacy", destination: URL(string: "https://example.com/privacy")!)
+                        Link("Privacy", destination: URL(string: "https://sparkly-flat-825.notion.site/Privacy-Policy-Trackit-2f3c24ebe50e8033b1fae997507127cd?pvs=74")!)
                     }
                     .font(.system(size: 12))
                     .foregroundColor(.white.opacity(0.3))

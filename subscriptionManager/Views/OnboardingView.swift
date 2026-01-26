@@ -418,7 +418,7 @@ struct OnboardingPage1: View {
                 .offset(y: textAppeared ? 0 : 30)
                 .opacity(textAppeared ? 1 : 0)
 
-            Text("Keep regular expenses on hand\nand receive timely notifications of\nupcoming fees")
+            Text("See your recurring expenses and\nget notified before you're charged")
                 .font(.system(size: 16, weight: .regular))
                 .foregroundColor(Color(white: 0.55))
                 .multilineTextAlignment(.center)
@@ -459,7 +459,7 @@ struct OnboardingPage2: View {
                 .offset(y: textAppeared ? 0 : 30)
                 .opacity(textAppeared ? 1 : 0)
 
-            Text("See all your subscriptions in one place\nwith renewal dates and costs")
+            Text("See renewal dates, costs, and\nupcoming charges instantly")
                 .font(.system(size: 16, weight: .regular))
                 .foregroundColor(Color(white: 0.55))
                 .multilineTextAlignment(.center)
@@ -489,7 +489,7 @@ struct OnboardingPage3: View {
             NotificationMockup()
                 .padding(.bottom, 60)
 
-            Text("Get real-time\nnotifications")
+            Text("Never miss a renewal")
                 .font(.system(size: 32, weight: .bold))
                 .foregroundColor(.white)
                 .multilineTextAlignment(.center)
@@ -497,7 +497,7 @@ struct OnboardingPage3: View {
                 .offset(y: textAppeared ? 0 : 30)
                 .opacity(textAppeared ? 1 : 0)
 
-            Text("Never miss a renewal date with\ntimely reminders before you're charged")
+            Text("Get reminders before subscriptions\nrenew or charge your card")
                 .font(.system(size: 16, weight: .regular))
                 .foregroundColor(Color(white: 0.55))
                 .multilineTextAlignment(.center)

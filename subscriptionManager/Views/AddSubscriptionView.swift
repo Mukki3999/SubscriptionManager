@@ -69,7 +69,9 @@ struct AddSubscriptionView: View {
 
     private var chipCategories: [CompanyCategory] {
         let present = Set(companies.map { $0.category })
-        return CompanyCategory.allCases.filter { present.contains($0) }
+        return CompanyCategory.allCases
+            .filter { present.contains($0) }
+            .sorted { categoryTitle($0) < categoryTitle($1) }
     }
 
     var body: some View {

@@ -7,6 +7,23 @@
 
 import Foundation
 
+// MARK: - Scan Mode
+
+/// Scan mode for subscription detection
+enum ScanMode {
+    /// Use history API to fetch only new emails since last scan (default for rescans)
+    case incremental
+    /// Complete rescan of all emails (first time or forced refresh)
+    case full
+
+    var displayName: String {
+        switch self {
+        case .incremental: return "Quick Scan"
+        case .full: return "Full Scan"
+        }
+    }
+}
+
 // MARK: - Detection Configuration
 
 /// Configuration for subscription detection tuning
@@ -58,6 +75,11 @@ final class SubscriptionDetectionService: ObservableObject {
     private let gmailService: GmailAPIService
     private let merchantDB = MerchantDatabase.shared
     private let config: DetectionConfig
+
+    // MARK: - Caching & Sync
+
+    private let messageCache = GmailMessageCache.shared
+    private let syncStateManager = GmailSyncStateManager.shared
 
     // MARK: - Blocklists
 
@@ -316,30 +338,53 @@ final class SubscriptionDetectionService: ObservableObject {
 
     // MARK: - Public Methods
 
-    func scanForSubscriptions(accessToken: String) async throws -> DetectionResult {
+    /// Scan for subscriptions with optional incremental mode
+    /// - Parameters:
+    ///   - accessToken: OAuth access token
+    ///   - mode: Scan mode (.incremental for rescan, .full for first time or forced)
+    /// - Returns: DetectionResult with found subscriptions
+    func scanForSubscriptions(
+        accessToken: String,
+        mode: ScanMode = .incremental
+    ) async throws -> DetectionResult {
         let startTime = Date()
         isScanning = true
         progress = .initial
 
         defer { isScanning = false }
 
+        // Determine effective scan mode
+        let effectiveMode = await determineEffectiveScanMode(
+            requestedMode: mode,
+            accessToken: accessToken
+        )
+
         // Pass 1: Fast metadata scan with optimized query
         progress = ScanProgress(
             phase: .fetchingMetadata,
             emailsScanned: 0,
             candidatesFound: 0,
+            hasGmailAccount: true,
             storeKitPhase: .unavailable,
             transactionsScanned: 0,
             storeKitCandidatesFound: 0
         )
 
-        let candidates = try await performMetadataScan(accessToken: accessToken)
+        let candidates: [MerchantCandidate]
+
+        switch effectiveMode {
+        case .incremental:
+            candidates = try await performIncrementalScan(accessToken: accessToken)
+        case .full:
+            candidates = try await performFullScan(accessToken: accessToken)
+        }
 
         // Pass 2: Detailed analysis with enhanced scoring
         progress = ScanProgress(
             phase: .analyzingCandidates,
             emailsScanned: progress.emailsScanned,
             candidatesFound: candidates.count,
+            hasGmailAccount: true,
             storeKitPhase: .unavailable,
             transactionsScanned: 0,
             storeKitCandidatesFound: 0
@@ -347,11 +392,20 @@ final class SubscriptionDetectionService: ObservableObject {
 
         let subscriptions = analyzeAndScoreCandidates(candidates: candidates)
 
+        // Update sync state
+        await updateSyncState(
+            mode: effectiveMode,
+            subscriptionCount: subscriptions.count,
+            emailsScanned: progress.emailsScanned,
+            accessToken: accessToken
+        )
+
         // Complete
         progress = ScanProgress(
             phase: .complete,
             emailsScanned: progress.emailsScanned,
             candidatesFound: subscriptions.count,
+            hasGmailAccount: true,
             storeKitPhase: .unavailable,
             transactionsScanned: 0,
             storeKitCandidatesFound: 0
@@ -364,6 +418,191 @@ final class SubscriptionDetectionService: ObservableObject {
             emailsScanned: progress.emailsScanned,
             scanDuration: duration
         )
+    }
+
+    /// Force a full scan (clears sync state)
+    func forceFullScan(accessToken: String) async throws -> DetectionResult {
+        await syncStateManager.clearState()
+        await messageCache.clear()
+        return try await scanForSubscriptions(accessToken: accessToken, mode: .full)
+    }
+
+    /// Check if incremental sync is available
+    func canPerformIncrementalSync() async -> Bool {
+        let state = await syncStateManager.getState()
+        return state.canPerformIncrementalSync
+    }
+
+    /// Get last sync info for display
+    func getLastSyncInfo() async -> (date: Date?, mode: String?) {
+        let state = await syncStateManager.getState()
+        let lastDate = state.lastIncrementalSyncDate ?? state.lastFullScanDate
+        let mode = state.lastIncrementalSyncDate != nil ? "Quick Scan" : "Full Scan"
+        return (lastDate, mode)
+    }
+
+    // MARK: - Scan Mode Helpers
+
+    /// Determine the effective scan mode based on sync state
+    private func determineEffectiveScanMode(
+        requestedMode: ScanMode,
+        accessToken: String
+    ) async -> ScanMode {
+        // If full scan requested, use it
+        if requestedMode == .full {
+            return .full
+        }
+
+        // Check if we have a valid history ID for incremental sync
+        let state = await syncStateManager.getState()
+        guard state.canPerformIncrementalSync else {
+            // No history ID - must do full scan
+            return .full
+        }
+
+        return .incremental
+    }
+
+    /// Perform an incremental scan using Gmail History API
+    private func performIncrementalScan(accessToken: String) async throws -> [MerchantCandidate] {
+        let state = await syncStateManager.getState()
+
+        guard let lastHistoryId = state.lastHistoryId else {
+            // No history ID - fall back to full scan
+            return try await performFullScan(accessToken: accessToken)
+        }
+
+        // Try to get new messages since last sync
+        let syncResult = try await gmailService.fetchNewMessageIds(
+            accessToken: accessToken,
+            startHistoryId: lastHistoryId
+        )
+
+        // If history expired, fall back to full scan
+        if syncResult.historyExpired {
+            return try await performFullScan(accessToken: accessToken)
+        }
+
+        // If no new messages, return empty (existing subscriptions still valid)
+        guard !syncResult.newMessageIds.isEmpty else {
+            progress.emailsScanned = 0
+            return []
+        }
+
+        // Fetch details for new messages only
+        let newMessages = try await gmailService.fetchMessagesByIds(
+            accessToken: accessToken,
+            messageIds: syncResult.newMessageIds,
+            format: config.useMetadataOnlyMode ? .metadata : .full,
+            useCache: true
+        )
+
+        progress.emailsScanned = newMessages.count
+
+        // Update history ID
+        await syncStateManager.updateHistoryId(syncResult.latestHistoryId)
+
+        // Process new messages into candidates
+        return groupMessagesIntoCandidates(newMessages)
+    }
+
+    /// Perform a full scan (all messages matching query)
+    private func performFullScan(accessToken: String) async throws -> [MerchantCandidate] {
+        // Get current history ID before scanning (for future incremental syncs)
+        let currentHistoryId = try? await gmailService.getCurrentHistoryId(accessToken: accessToken)
+
+        // Perform the full metadata scan
+        let candidates = try await performMetadataScan(accessToken: accessToken)
+
+        // Store history ID for future incremental syncs
+        if let historyId = currentHistoryId {
+            await syncStateManager.updateHistoryId(historyId)
+        }
+
+        return candidates
+    }
+
+    /// Update sync state after scan completion
+    private func updateSyncState(
+        mode: ScanMode,
+        subscriptionCount: Int,
+        emailsScanned: Int,
+        accessToken: String
+    ) async {
+        switch mode {
+        case .full:
+            // Get fresh history ID
+            let historyId = try? await gmailService.getCurrentHistoryId(accessToken: accessToken)
+            let processedIds = await messageCache.getAllCachedIds()
+
+            await syncStateManager.markFullScanComplete(
+                historyId: historyId,
+                processedIds: processedIds,
+                subscriptionCount: subscriptionCount,
+                emailsScanned: emailsScanned
+            )
+
+        case .incremental:
+            let state = await syncStateManager.getState()
+            if let historyId = state.lastHistoryId {
+                let newIds = await messageCache.getAllCachedIds()
+                await syncStateManager.markIncrementalSyncComplete(
+                    historyId: historyId,
+                    newMessageIds: newIds,
+                    subscriptionCount: subscriptionCount
+                )
+            }
+        }
+    }
+
+    /// Group messages into merchant candidates (shared by both scan modes)
+    private func groupMessagesIntoCandidates(_ messages: [GmailMessage]) -> [MerchantCandidate] {
+        var senderGroups: [String: [GmailMessage]] = [:]
+        var paymentProcessorEmails: [GmailMessage] = []
+
+        for message in messages {
+            let senderDomain = extractSenderDomain(from: message.from)
+
+            // Skip hard-excluded domains immediately
+            guard !hardExcludeDomains.contains(senderDomain) else { continue }
+
+            // Skip blocked domains
+            guard !isBlockedDomain(senderDomain) else { continue }
+
+            // Skip if sender looks like an individual person
+            guard !looksLikeIndividual(message.from) else { continue }
+
+            // Check if this is from a payment processor (needs special handling)
+            if isPaymentProcessor(senderDomain) {
+                paymentProcessorEmails.append(message)
+            } else {
+                senderGroups[senderDomain, default: []].append(message)
+            }
+        }
+
+        // Convert direct senders to candidates
+        var candidates: [MerchantCandidate] = []
+
+        for (senderDomain, emails) in senderGroups {
+            guard !emails.isEmpty else { continue }
+
+            let candidate = MerchantCandidate(
+                senderDomain: senderDomain,
+                senderEmail: emails.first?.from ?? "",
+                emails: emails,
+                knownMerchant: merchantDB.findMerchant(byDomain: senderDomain),
+                isFromPaymentProcessor: false,
+                extractedMerchantName: nil
+            )
+
+            candidates.append(candidate)
+        }
+
+        // Process payment processor emails to extract actual merchants
+        let processorCandidates = processPaymentProcessorEmails(paymentProcessorEmails)
+        candidates.append(contentsOf: processorCandidates)
+
+        return candidates
     }
 
     // MARK: - Pass 1: Metadata Scan

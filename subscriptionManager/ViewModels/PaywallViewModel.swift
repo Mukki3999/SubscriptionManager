@@ -132,8 +132,24 @@ final class PaywallViewModel: ObservableObject {
         }
     }
 
+    /// Check if products are loaded
+    var productsLoaded: Bool {
+        !products.isEmpty
+    }
+
     /// Purchase the selected plan
     func purchase() async {
+        // Check if products are loaded first
+        guard productsLoaded else {
+            #if DEBUG
+            errorMessage = "StoreKit products not loaded. In Xcode: Edit Scheme > Run > Options > StoreKit Configuration > Select 'Configuration.storekit'"
+            #else
+            errorMessage = "Unable to load products. Please check your internet connection and try again."
+            #endif
+            showError = true
+            return
+        }
+
         guard let product = selectedProduct else {
             errorMessage = "Please select a plan"
             showError = true

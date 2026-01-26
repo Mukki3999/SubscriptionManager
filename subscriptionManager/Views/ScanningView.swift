@@ -120,15 +120,17 @@ struct ScanningView: View {
 
                     // Source-specific progress rows
                     VStack(spacing: 12) {
-                        // Gmail progress row
-                        scanSourceRow(
-                            assetImage: "GmailLogo 1",
-                            title: "Gmail",
-                            status: progress.phase.rawValue,
-                            detail: progress.emailsScanned > 0 ? "\(progress.emailsScanned) emails" : nil,
-                            candidatesFound: progress.candidatesFound,
-                            isComplete: progress.phase == .complete
-                        )
+                        // Gmail progress row (only show if Gmail account connected)
+                        if progress.hasGmailAccount {
+                            scanSourceRow(
+                                assetImage: "GmailLogo 1",
+                                title: "Gmail",
+                                status: progress.phase.rawValue,
+                                detail: progress.emailsScanned > 0 ? "\(progress.emailsScanned) emails" : nil,
+                                candidatesFound: progress.candidatesFound,
+                                isComplete: progress.phase == .complete
+                            )
+                        }
 
                         // App Store progress row (only show if not unavailable)
                         if progress.storeKitPhase != .unavailable {
@@ -345,6 +347,7 @@ struct ScanningView: View {
             phase: .fetchingMetadata,
             emailsScanned: 127,
             candidatesFound: 5,
+            hasGmailAccount: true,
             storeKitPhase: .fetchingTransactions,
             transactionsScanned: 12,
             storeKitCandidatesFound: 3

@@ -8,10 +8,25 @@
 import Foundation
 import SwiftUI
 
+// MARK: - Related Emails Cache Entry
+
+private struct RelatedEmailsCacheEntry {
+    let emails: [GmailMessage]
+    let timestamp: Date
+}
+
 // MARK: - Subscription Detail ViewModel
 
 @MainActor
 final class SubscriptionDetailViewModel: ObservableObject {
+
+    // MARK: - Static Cache
+
+    /// Shared cache for related email results (survives view model lifecycle)
+    private static var relatedEmailsCache: [String: RelatedEmailsCacheEntry] = [:]
+
+    /// Cache time-to-live (1 hour)
+    private static let cacheTTL: TimeInterval = 3600
 
     // MARK: - Published Properties
 
@@ -21,6 +36,7 @@ final class SubscriptionDetailViewModel: ObservableObject {
     @Published private(set) var relatedEmails: [GmailMessage] = []
     @Published private(set) var isLoadingEmails = false
     @Published private(set) var emailSearchError: String?
+    @Published private(set) var isFromCache = false
     @Published var showWebCancelInterstitial = false
 
     // MARK: - Private Properties
@@ -94,6 +110,10 @@ final class SubscriptionDetailViewModel: ObservableObject {
         managementType == .unknown
     }
 
+    var isManuallyAdded: Bool {
+        subscription.detectionSource == .manual
+    }
+
     var hasRelatedEmails: Bool {
         !relatedEmails.isEmpty
     }
@@ -105,8 +125,18 @@ final class SubscriptionDetailViewModel: ObservableObject {
         case .web:
             return "Manage Subscription"
         case .unknown:
-            return "Find Cancellation Info"
+            // For manually added, go to website; otherwise search emails
+            return isManuallyAdded ? "Manage on Website" : "Find Cancellation Info"
         }
+    }
+
+    /// Get the fallback website URL from the subscription's domain
+    var fallbackAccountURL: String? {
+        let domain = subscription.senderEmail
+        guard !domain.isEmpty else { return nil }
+        let cleanDomain = domain.lowercased()
+            .replacingOccurrences(of: "www.", with: "")
+        return "https://www.\(cleanDomain)"
     }
 
     // MARK: - Public Methods
@@ -132,9 +162,14 @@ final class SubscriptionDetailViewModel: ObservableObject {
             }
 
         case .unknown:
-            // For unknown, search for related emails
-            Task {
-                await searchRelatedEmails()
+            if isManuallyAdded {
+                // For manually added subscriptions, go to the company's website
+                openFallbackAccountURL()
+            } else {
+                // For email-detected subscriptions, search for related emails
+                Task {
+                    await searchRelatedEmails()
+                }
             }
         }
     }
@@ -150,6 +185,12 @@ final class SubscriptionDetailViewModel: ObservableObject {
         URLLaunchService.openInSafari(urlString)
     }
 
+    /// Open the fallback account URL for manually added subscriptions
+    func openFallbackAccountURL() {
+        guard let urlString = fallbackAccountURL else { return }
+        URLLaunchService.openInSafari(urlString)
+    }
+
     /// Confirm and open the cancel URL after seeing interstitial
     func confirmAndOpenCancelURL() {
         hasSeenWebCancelInterstitial = true
@@ -157,10 +198,25 @@ final class SubscriptionDetailViewModel: ObservableObject {
         openCancelURL()
     }
 
-    /// Search for related emails in Gmail
+    /// Search for related emails in Gmail (with caching)
     func searchRelatedEmails() async {
+        // Create cache key from subscription ID
+        let cacheKey = subscription.id.uuidString
+
+        // Check cache first
+        if let cached = Self.relatedEmailsCache[cacheKey] {
+            let age = Date().timeIntervalSince(cached.timestamp)
+            if age < Self.cacheTTL {
+                // Cache hit - use cached results
+                relatedEmails = cached.emails
+                isFromCache = true
+                return
+            }
+        }
+
         isLoadingEmails = true
         emailSearchError = nil
+        isFromCache = false
 
         do {
             let accessToken = try await oauthService.getValidAccessToken()
@@ -176,11 +232,38 @@ final class SubscriptionDetailViewModel: ObservableObject {
             )
 
             relatedEmails = emails
+
+            // Cache the results
+            Self.relatedEmailsCache[cacheKey] = RelatedEmailsCacheEntry(
+                emails: emails,
+                timestamp: Date()
+            )
         } catch {
             emailSearchError = error.localizedDescription
         }
 
         isLoadingEmails = false
+    }
+
+    /// Force refresh related emails (bypasses cache)
+    func refreshRelatedEmails() async {
+        // Remove from cache
+        Self.relatedEmailsCache.removeValue(forKey: subscription.id.uuidString)
+        // Fetch fresh
+        await searchRelatedEmails()
+    }
+
+    /// Clear the entire related emails cache
+    static func clearRelatedEmailsCache() {
+        relatedEmailsCache.removeAll()
+    }
+
+    /// Prune expired entries from cache
+    static func pruneRelatedEmailsCache() {
+        let now = Date()
+        relatedEmailsCache = relatedEmailsCache.filter { _, entry in
+            now.timeIntervalSince(entry.timestamp) < cacheTTL
+        }
     }
 
     // MARK: - Private Methods

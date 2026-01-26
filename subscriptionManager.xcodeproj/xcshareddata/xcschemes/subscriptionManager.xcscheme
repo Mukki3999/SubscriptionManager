@@ -74,16 +74,6 @@
             ReferencedContainer = "container:subscriptionManager.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <CommandLineArguments>
-         <CommandLineArgument
-            argument = "-FIRDebugEnabled"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "-FIRAnalyticsDebugEnabled"
-            isEnabled = "NO">
-         </CommandLineArgument>
-      </CommandLineArguments>
       <StoreKitConfigurationFileReference
          identifier = "../../subscriptionManager/Configuration.storekit">
       </StoreKitConfigurationFileReference>

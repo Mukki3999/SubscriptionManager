@@ -84,9 +84,14 @@ final class PurchaseService: ObservableObject {
         do {
             products = try await Product.products(for: productIDs)
                 .sorted { $0.price < $1.price }
-            print("PurchaseService: Loaded \(products.count) products")
+            print("PurchaseService: Loaded \(products.count) products: \(products.map { $0.id })")
         } catch {
             print("PurchaseService: Failed to load products - \(error.localizedDescription)")
+            #if DEBUG
+            print("PurchaseService: [DEBUG] Make sure StoreKit Configuration is linked in Xcode Scheme:")
+            print("  1. Edit Scheme > Run > Options")
+            print("  2. StoreKit Configuration > Select 'Configuration.storekit'")
+            #endif
         }
     }
 

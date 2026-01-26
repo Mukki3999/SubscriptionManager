@@ -17,6 +17,7 @@ struct SubscriptionReviewView: View {
     @State private var selectedSubscription: Subscription?
     @State private var showingAddSheet = false
     @State private var showAddCallout = false
+    @State private var calloutAnimated = false
 
     private let addCalloutKey = "review.hasSeenAddCallout"
 
@@ -91,6 +92,12 @@ struct SubscriptionReviewView: View {
             if viewModel.subscriptions.isEmpty,
                !UserDefaults.standard.bool(forKey: addCalloutKey) {
                 showAddCallout = true
+                // Delay the animation so it eases up after the view loads
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
+                        calloutAnimated = true
+                    }
+                }
             }
         }
         .sheet(item: $selectedSubscription) { subscription in
@@ -157,7 +164,8 @@ struct SubscriptionReviewView: View {
         .overlay(alignment: .topTrailing) {
             if showAddCallout {
                 addCallout
-                    .offset(x: 0, y: 44)
+                    .offset(x: 0, y: calloutAnimated ? 44 : 64)
+                    .opacity(calloutAnimated ? 1 : 0)
                     .zIndex(2)
             }
         }

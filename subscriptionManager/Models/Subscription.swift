@@ -167,6 +167,7 @@ struct ScanProgress {
     var emailsScanned: Int
     var candidatesFound: Int
     var currentMerchant: String?
+    var hasGmailAccount: Bool
 
     // StoreKit scanning progress
     var storeKitPhase: StoreKitScanPhase
@@ -193,6 +194,7 @@ struct ScanProgress {
             phase: .starting,
             emailsScanned: 0,
             candidatesFound: 0,
+            hasGmailAccount: true,
             storeKitPhase: .notStarted,
             transactionsScanned: 0,
             storeKitCandidatesFound: 0

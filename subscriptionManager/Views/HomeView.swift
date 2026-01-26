@@ -5,7 +5,6 @@
 //  Created by Karthik Khatri on 1/14/26.
 //
 
-import PhotosUI
 import SwiftUI
 import UIKit
 
@@ -56,10 +55,10 @@ struct HomeView: View {
     @State private var isBalanceHidden = false
     @State private var userName = ""
     @FocusState private var isNameFocused: Bool
-    @State private var selectedPhotoItem: PhotosPickerItem?
     @State private var profileImageData: Data?
     @State private var showAddSubscription = false
     @State private var showNotifications = false
+    @State private var showSettings = false
     @State private var selectedSubscription: Subscription?
     @State private var showInsights = false
     @State private var showInsightsPaywall = false
@@ -131,18 +130,8 @@ struct HomeView: View {
                 notificationViewModel.generateNotificationsForUpcomingRenewals(from: subscriptions)
                 notificationViewModel.scheduleSystemNotifications(for: subscriptions)
             }
-            .onChange(of: selectedPhotoItem) { newItem in
-                guard let newItem else { return }
-                Task {
-                    if let data = try? await newItem.loadTransferable(type: Data.self),
-                       let uiImage = UIImage(data: data),
-                       let jpegData = uiImage.jpegData(compressionQuality: 0.8) {
-                        await MainActor.run {
-                            profileImageData = jpegData
-                            UserDefaults.standard.set(jpegData, forKey: profileImageKey)
-                        }
-                    }
-                }
+            .sheet(isPresented: $showSettings) {
+                SettingsView(profileImageData: $profileImageData)
             }
             .sheet(item: $selectedSubscription) { subscription in
                 SubscriptionDetailView(
@@ -259,7 +248,7 @@ struct HomeView: View {
     private var greetingRow: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 12) {
-                PhotosPicker(selection: $selectedPhotoItem, matching: .images, photoLibrary: .shared()) {
+                Button(action: { showSettings = true }) {
                     profileAvatar
                 }
                 .buttonStyle(.plain)
@@ -279,6 +268,12 @@ struct HomeView: View {
                             .onSubmit { isNameFocused = false }
                             .autocorrectionDisabled()
                             .textInputAutocapitalization(.words)
+                            .onChange(of: userName) { newValue in
+                                let sanitized = sanitizeName(newValue)
+                                if sanitized != newValue {
+                                    userName = sanitized
+                                }
+                            }
 
                         Rectangle()
                             .fill(Color.white.opacity(isNameFocused ? 0.8 : 0.35))
@@ -391,7 +386,7 @@ struct HomeView: View {
                 .fill(Color.black.opacity(0.55))
                 .frame(width: 18, height: 18)
                 .overlay(
-                    Image(systemName: "camera.fill")
+                    Image(systemName: "gearshape.fill")
                         .font(.system(size: 9, weight: .semibold))
                         .foregroundColor(.white)
                 )
@@ -403,11 +398,32 @@ struct HomeView: View {
     private func loadProfile() {
         let defaults = UserDefaults.standard
         if let storedName = defaults.string(forKey: profileNameKey), !storedName.isEmpty {
-            userName = storedName
+            userName = sanitizeName(storedName)
         }
         if let storedImageData = defaults.data(forKey: profileImageKey) {
             profileImageData = storedImageData
         }
+    }
+
+    /// Sanitizes name input to only allow letters and spaces.
+    /// Prevents injection attacks and invalid characters.
+    private func sanitizeName(_ input: String) -> String {
+        // Only allow letters (including accented) and spaces
+        let allowedCharacters = CharacterSet.letters.union(CharacterSet(charactersIn: " "))
+        let filtered = input.unicodeScalars.filter { allowedCharacters.contains($0) }
+        var result = String(String.UnicodeScalarView(filtered))
+
+        // Collapse multiple spaces into one
+        while result.contains("  ") {
+            result = result.replacingOccurrences(of: "  ", with: " ")
+        }
+
+        // Limit length to prevent buffer issues (max 50 characters)
+        if result.count > 50 {
+            result = String(result.prefix(50))
+        }
+
+        return result
     }
 
     // MARK: - Upcoming Bill Section

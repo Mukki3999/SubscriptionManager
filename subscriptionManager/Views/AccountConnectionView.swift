@@ -124,6 +124,13 @@ struct AccountConnectionView: View {
                     .offset(y: buttonsAppeared ? 0 : 40)
                     .opacity(buttonsAppeared ? 1 : 0)
 
+                // "or" Divider
+                orDivider
+                    .padding(.horizontal, 24)
+                    .padding(.top, 20)
+                    .offset(y: buttonsAppeared ? 0 : 35)
+                    .opacity(buttonsAppeared ? 1 : 0)
+
                 // Continue to Inbox Button
                 continueButton
                     .padding(.horizontal, 24)
@@ -171,15 +178,17 @@ struct AccountConnectionView: View {
     // MARK: - Title Section
     private var titleSection: some View {
         VStack(spacing: 8) {
-            Text("Connect your")
-                .font(.system(size: 34, weight: .bold))
+            Text("Connect accounts to")
+                .font(.system(size: 28, weight: .bold))
                 .foregroundColor(.white)
 
-            HStack(spacing: 10) {
-                Text("accounts")
-                    .font(.system(size: 34, weight: .bold))
-                    .foregroundColor(Color(red: 0.45, green: 0.55, blue: 0.95))
-            }
+            Text("find your ")
+                .font(.system(size: 28, weight: .bold))
+                .foregroundColor(.white)
+            +
+            Text("subscriptions")
+                .font(.system(size: 28, weight: .bold))
+                .foregroundColor(Color(red: 0.45, green: 0.55, blue: 0.95))
         }
     }
 
@@ -190,7 +199,7 @@ struct AccountConnectionView: View {
                 connectedAccountRow(account)
             }
 
-            Text("You can remove accounts anytime in Settings.")
+            Text("You can disconnect accounts anytime from your profile.")
                 .font(.system(size: 13))
                 .foregroundColor(Color(white: 0.5))
                 .padding(.top, 8)
@@ -323,6 +332,23 @@ struct AccountConnectionView: View {
                             .foregroundColor(.black)
                     )
             }
+        }
+    }
+
+    // MARK: - Or Divider
+    private var orDivider: some View {
+        HStack(spacing: 16) {
+            Rectangle()
+                .fill(Color.white.opacity(0.15))
+                .frame(height: 1)
+
+            Text("or")
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(Color(white: 0.45))
+
+            Rectangle()
+                .fill(Color.white.opacity(0.15))
+                .frame(height: 1)
         }
     }
 
