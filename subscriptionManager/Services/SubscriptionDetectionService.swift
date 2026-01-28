@@ -586,11 +586,14 @@ final class SubscriptionDetectionService: ObservableObject {
         for (senderDomain, emails) in senderGroups {
             guard !emails.isEmpty else { continue }
 
+            // Combine email content for better merchant matching (e.g., distinguishing iCloud from Apple Music)
+            let emailContent = emails.map { "\($0.subject) \($0.snippet)" }.joined(separator: " ")
+
             let candidate = MerchantCandidate(
                 senderDomain: senderDomain,
                 senderEmail: emails.first?.from ?? "",
                 emails: emails,
-                knownMerchant: merchantDB.findMerchant(byDomain: senderDomain),
+                knownMerchant: merchantDB.findMerchant(byDomain: senderDomain, emailContent: emailContent),
                 isFromPaymentProcessor: false,
                 extractedMerchantName: nil
             )
@@ -649,11 +652,14 @@ final class SubscriptionDetectionService: ObservableObject {
         for (senderDomain, emails) in senderGroups {
             guard !emails.isEmpty else { continue }
 
+            // Combine email content for better merchant matching (e.g., distinguishing iCloud from Apple Music)
+            let emailContent = emails.map { "\($0.subject) \($0.snippet)" }.joined(separator: " ")
+
             let candidate = MerchantCandidate(
                 senderDomain: senderDomain,
                 senderEmail: emails.first?.from ?? "",
                 emails: emails,
-                knownMerchant: merchantDB.findMerchant(byDomain: senderDomain),
+                knownMerchant: merchantDB.findMerchant(byDomain: senderDomain, emailContent: emailContent),
                 isFromPaymentProcessor: false,
                 extractedMerchantName: nil
             )

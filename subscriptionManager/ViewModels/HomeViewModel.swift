@@ -222,6 +222,14 @@ final class HomeViewModel: ObservableObject {
         syncOrderWithSubscriptions()
     }
 
+    /// Update an existing subscription
+    func updateSubscription(_ subscription: Subscription) {
+        if let index = subscriptions.firstIndex(where: { $0.id == subscription.id }) {
+            subscriptions[index] = subscription
+            subscriptionProvider.saveSubscriptions(subscriptions)
+        }
+    }
+
     /// Move a subscription from one position to another
     func moveSubscription(from sourceIndex: Int, to destinationIndex: Int) {
         let orderedSubscriptions = allSubscriptions

@@ -140,6 +140,9 @@ struct HomeView: View {
                     cardColor: cardColorForSubscription(subscription),
                     onDelete: {
                         viewModel.deleteSubscription(subscription)
+                    },
+                    onUpdate: { updatedSubscription in
+                        viewModel.updateSubscription(updatedSubscription)
                     }
                 )
             }

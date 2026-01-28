@@ -20,6 +20,15 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     ) -> Bool {
         FirebaseApp.configure()
 
+        // Clear stale Keychain data on fresh install
+        // UserDefaults are deleted on app uninstall, but Keychain persists
+        // This ensures a clean state after reinstall
+        let hasLaunchedKey = "hasLaunchedBefore"
+        if !UserDefaults.standard.bool(forKey: hasLaunchedKey) {
+            KeychainService.shared.clearAll()
+            UserDefaults.standard.set(true, forKey: hasLaunchedKey)
+        }
+
         // Set notification center delegate
         UNUserNotificationCenter.current().delegate = self
 
