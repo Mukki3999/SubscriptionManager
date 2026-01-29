@@ -110,6 +110,9 @@ struct SubscriptionReviewView: View {
                 showsManageButton: false,
                 onDelete: {
                     viewModel.removeSubscription(subscription)
+                },
+                onUpdate: { updatedSubscription in
+                    viewModel.updateSubscription(updatedSubscription, price: updatedSubscription.price)
                 }
             )
         }

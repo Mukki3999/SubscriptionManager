@@ -94,6 +94,52 @@ final class SubscriptionDetailViewModel: ObservableObject {
         subscription.senderEmail
     }
 
+    /// Check if sender email appears to match the subscription (not showing wrong info)
+    var senderEmailLooksValid: Bool {
+        let email = subscription.senderEmail.lowercased()
+        let name = subscription.name.lowercased()
+        let merchantId = subscription.merchantId.lowercased()
+
+        // If no sender email, don't show the row
+        guard !email.isEmpty else { return false }
+
+        // Extract domain from email
+        guard let atIndex = email.lastIndex(of: "@") else { return false }
+        let domain = String(email[email.index(after: atIndex)...])
+
+        // Check if domain contains merchant name or vice versa
+        let nameParts = name.components(separatedBy: CharacterSet.alphanumerics.inverted).filter { !$0.isEmpty }
+        for part in nameParts where part.count >= 3 {
+            if domain.contains(part) { return true }
+        }
+
+        // Check common known mappings
+        let knownMappings: [String: [String]] = [
+            "icloud": ["apple.com", "icloud.com"],
+            "apple": ["apple.com", "itunes.com"],
+            "netflix": ["netflix.com"],
+            "spotify": ["spotify.com"],
+            "youtube": ["google.com", "youtube.com"],
+            "google": ["google.com"],
+            "microsoft": ["microsoft.com", "office.com"],
+            "amazon": ["amazon.com"],
+            "disney": ["disney.com", "disneyplus.com"],
+        ]
+
+        for (key, validDomains) in knownMappings {
+            if name.contains(key) || merchantId.contains(key) {
+                for validDomain in validDomains {
+                    if domain.contains(validDomain) { return true }
+                }
+                // If we matched a known service but domain doesn't match, it's wrong
+                return false
+            }
+        }
+
+        // Default: show if we can't determine
+        return true
+    }
+
     var merchantId: String {
         subscription.merchantId
     }

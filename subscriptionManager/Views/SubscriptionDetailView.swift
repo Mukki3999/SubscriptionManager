@@ -17,6 +17,9 @@ struct SubscriptionDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showCancellationSteps = false
     @State private var showDeleteConfirmation = false
+    @State private var showPriceEditor = false
+    @State private var editedPrice: String = ""
+    @State private var currentSubscription: Subscription
 
     let subscription: Subscription
     let logoImage: String?
@@ -25,6 +28,7 @@ struct SubscriptionDetailView: View {
     let showsFromRow: Bool
     let showsManageButton: Bool
     var onDelete: (() -> Void)?
+    var onUpdate: ((Subscription) -> Void)?
 
     // MARK: - Theme Constants
 
@@ -41,15 +45,18 @@ struct SubscriptionDetailView: View {
         showsCancellationSection: Bool = true,
         showsFromRow: Bool = true,
         showsManageButton: Bool = true,
-        onDelete: (() -> Void)? = nil
+        onDelete: (() -> Void)? = nil,
+        onUpdate: ((Subscription) -> Void)? = nil
     ) {
         self.subscription = subscription
+        self._currentSubscription = State(initialValue: subscription)
         self.logoImage = logoImage
         self.cardColor = cardColor
         self.showsCancellationSection = showsCancellationSection
         self.showsFromRow = showsFromRow
         self.showsManageButton = showsManageButton
         self.onDelete = onDelete
+        self.onUpdate = onUpdate
         _viewModel = StateObject(wrappedValue: SubscriptionDetailViewModel(subscription: subscription))
     }
 
@@ -109,6 +116,96 @@ struct SubscriptionDetailView: View {
         } message: {
             Text("This will remove \(viewModel.subscriptionName) from your tracked subscriptions.")
         }
+        .sheet(isPresented: $showPriceEditor) {
+            priceEditorSheet
+        }
+    }
+
+    // MARK: - Price Editor Sheet
+
+    private var priceEditorSheet: some View {
+        NavigationStack {
+            VStack(spacing: 24) {
+                VStack(spacing: 8) {
+                    Text("Edit Price")
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(.white)
+
+                    Text("Enter the correct subscription price")
+                        .font(.system(size: 14))
+                        .foregroundColor(.white.opacity(0.6))
+                }
+                .padding(.top, 20)
+
+                // Price input field
+                HStack(spacing: 4) {
+                    Text("$")
+                        .font(.system(size: 32, weight: .bold))
+                        .foregroundColor(.white)
+
+                    TextField("0.00", text: $editedPrice)
+                        .font(.system(size: 32, weight: .bold))
+                        .foregroundColor(.white)
+                        .keyboardType(.decimalPad)
+                        .multilineTextAlignment(.leading)
+                        .frame(maxWidth: 150)
+                }
+                .padding(.horizontal, 24)
+                .padding(.vertical, 16)
+                .background(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .fill(Color.white.opacity(0.1))
+                )
+                .padding(.horizontal, 40)
+
+                Spacer()
+
+                // Save button
+                Button(action: savePrice) {
+                    Text("Save")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundColor(.black)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                .fill(Color.white)
+                        )
+                }
+                .padding(.horizontal, 20)
+                .padding(.bottom, 20)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(backgroundColor.ignoresSafeArea())
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Cancel") {
+                        showPriceEditor = false
+                    }
+                    .foregroundColor(.white)
+                }
+            }
+        }
+        .presentationDetents([.height(300)])
+        .presentationDragIndicator(.visible)
+    }
+
+    private func savePrice() {
+        // Parse the price and validate
+        let cleanedPrice = editedPrice.replacingOccurrences(of: ",", with: ".")
+        guard let newPrice = Double(cleanedPrice), newPrice > 0 else {
+            return
+        }
+
+        // Update the subscription
+        var updatedSubscription = currentSubscription
+        updatedSubscription.price = newPrice
+        currentSubscription = updatedSubscription
+
+        // Notify parent to persist the change
+        onUpdate?(updatedSubscription)
+
+        showPriceEditor = false
     }
 
     // MARK: - Main Colored Card
@@ -200,7 +297,7 @@ struct SubscriptionDetailView: View {
 
     private var subscriptionInfoSection: some View {
         VStack(spacing: 0) {
-            infoRow(title: "Price", value: viewModel.subscriptionPrice)
+            editablePriceRow
 
             rowDivider
 
@@ -222,6 +319,35 @@ struct SubscriptionDetailView: View {
         }
     }
 
+    // MARK: - Editable Price Row
+
+    private var editablePriceRow: some View {
+        Button(action: {
+            editedPrice = String(format: "%.2f", currentSubscription.price)
+            showPriceEditor = true
+        }) {
+            HStack(spacing: 12) {
+                Text("Price")
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(.black.opacity(0.6))
+
+                Spacer()
+
+                HStack(spacing: 8) {
+                    Text(currentSubscription.formattedPrice)
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundColor(.black.opacity(0.85))
+
+                    Image(systemName: "pencil")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundColor(.black.opacity(0.5))
+                }
+            }
+            .padding(.vertical, 14)
+        }
+        .buttonStyle(.plain)
+    }
+
     // MARK: - Settings Section
 
     private var settingsSection: some View {
@@ -240,7 +366,7 @@ struct SubscriptionDetailView: View {
                 icon: managementTypeIcon
             )
 
-            if showsFromRow, !viewModel.senderEmail.isEmpty {
+            if showsFromRow, viewModel.senderEmailLooksValid {
                 rowDivider
 
                 infoRow(

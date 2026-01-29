@@ -640,6 +640,37 @@ final class MerchantDatabase {
         }
     }
 
+    /// Find merchant by domain AND email content (subject/snippet)
+    /// This is more accurate for domains shared by multiple services (e.g., apple.com)
+    func findMerchant(byDomain domain: String, emailContent: String) -> MerchantInfo? {
+        let lowercaseDomain = domain.lowercased()
+        let lowercaseContent = emailContent.lowercased()
+
+        // Get all merchants matching this domain
+        let matchingMerchants = merchants.filter { merchant in
+            merchant.domains.contains { lowercaseDomain.contains($0.lowercased()) }
+        }
+
+        // If only one match, return it
+        if matchingMerchants.count == 1 {
+            return matchingMerchants.first
+        }
+
+        // If multiple matches, use senderPatterns to find the best match
+        if matchingMerchants.count > 1 {
+            for merchant in matchingMerchants {
+                for pattern in merchant.senderPatterns {
+                    if lowercaseContent.contains(pattern.lowercased()) {
+                        return merchant
+                    }
+                }
+            }
+        }
+
+        // Fall back to first match
+        return matchingMerchants.first
+    }
+
     /// Find merchant by sender email
     func findMerchant(bySenderEmail email: String) -> MerchantInfo? {
         let lowercaseEmail = email.lowercased()
