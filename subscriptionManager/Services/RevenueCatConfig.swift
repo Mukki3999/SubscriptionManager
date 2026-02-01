@@ -10,18 +10,15 @@ import Foundation
 /// Configuration for RevenueCat SDK
 enum RevenueCatConfig {
 
-    /// The RevenueCat API key (read from Info.plist, configured via xcconfig)
+    /// The RevenueCat public API key
+    /// Note: Public SDK keys (appl_, test_) are safe to embed - they're designed for
+    /// client apps and only work with your specific bundle ID
     static var apiKey: String {
-        if let key = Bundle.main.object(forInfoDictionaryKey: "REVENUECAT_API_KEY") as? String,
-           !key.isEmpty,
-           !key.hasPrefix("$("),
-           !key.contains("YOUR_") {
-            return key
-        }
         #if DEBUG
-        assertionFailure("RevenueCat API key not configured. Copy Secrets.xcconfig.template to Debug.xcconfig and add your key.")
+        return "test_FmFzWpNTEGcUBePMXlcDlKfOIKj"
+        #else
+        return "appl_AqGPpgCVWDZnZwBDTlCXLgAJBrB"
         #endif
-        return ""
     }
 
     /// The entitlement identifier for Pro subscription
