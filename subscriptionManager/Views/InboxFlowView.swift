@@ -87,7 +87,7 @@ struct InboxFlowView: View {
             }
         }
         .fullScreenCover(isPresented: $showPaywall) {
-            PaywallView(
+            PaywallContainerView(
                 trigger: .onboarding,
                 detectedSubscriptionCount: detectedCount,
                 onContinueFree: {

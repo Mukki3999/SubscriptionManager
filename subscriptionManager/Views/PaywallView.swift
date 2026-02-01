@@ -45,11 +45,12 @@ private let socialProofItems: [SocialProofItem] = [
     ),
 ]
 
-// MARK: - Paywall View
+// MARK: - Custom Paywall View
 
-struct PaywallView: View {
+/// Custom paywall UI for the control group in A/B testing
+struct CustomPaywallView: View {
 
-    @StateObject private var viewModel: PaywallViewModel
+    @ObservedObject var viewModel: PaywallViewModel
     @Environment(\.dismiss) private var dismiss
 
     let onContinueFree: (() -> Void)?
@@ -68,15 +69,11 @@ struct PaywallView: View {
     // MARK: - Initialization
 
     init(
-        trigger: PaywallTrigger,
-        detectedSubscriptionCount: Int? = nil,
+        viewModel: PaywallViewModel,
         onContinueFree: (() -> Void)? = nil,
         onPurchaseSuccess: (() -> Void)? = nil
     ) {
-        _viewModel = StateObject(wrappedValue: PaywallViewModel(
-            trigger: trigger,
-            detectedSubscriptionCount: detectedSubscriptionCount
-        ))
+        self.viewModel = viewModel
         self.onContinueFree = onContinueFree
         self.onPurchaseSuccess = onPurchaseSuccess
     }
@@ -374,16 +371,16 @@ struct PaywallView: View {
                     .font(.system(size: 12, weight: .medium))
                     .foregroundColor(.white.opacity(0.7))
 
-                Text(plan == .annual ? "$39.99" : "$4.99")
+                Text(viewModel.formattedPrice(for: plan) ?? "—")
                     .font(.system(size: 20, weight: .bold))
                     .foregroundColor(.white)
 
-                Text(plan == .annual ? "/year" : "/month")
+                Text(viewModel.periodSuffix(for: plan))
                     .font(.system(size: 11))
                     .foregroundColor(.white.opacity(0.5))
 
-                if plan == .annual {
-                    Text("$3.33/mo")
+                if plan == .annual, let monthlyEquivalent = viewModel.formattedMonthlyEquivalent(for: plan) {
+                    Text("\(monthlyEquivalent)/mo")
                         .font(.system(size: 10, weight: .medium))
                         .foregroundColor(accentColor)
                 } else {
@@ -463,9 +460,8 @@ private struct ScaleButtonStyle: ButtonStyle {
 // MARK: - Preview
 
 #Preview {
-    PaywallView(
-        trigger: .onboarding,
-        detectedSubscriptionCount: 12,
+    CustomPaywallView(
+        viewModel: PaywallViewModel(trigger: .onboarding, detectedSubscriptionCount: 12),
         onContinueFree: { print("Continue free") },
         onPurchaseSuccess: { print("Purchase success") }
     )
