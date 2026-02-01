@@ -9,6 +9,7 @@ import SwiftUI
 import UserNotifications
 import StoreKit
 import FirebaseCore
+import RevenueCat
 
 // MARK: - App Delegate
 
@@ -19,6 +20,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
         FirebaseApp.configure()
+
+        // Configure RevenueCat SDK (before any purchase operations)
+        RevenueCatPurchaseService.shared.configure()
 
         // Clear stale Keychain data on fresh install
         // UserDefaults are deleted on app uninstall, but Keychain persists
@@ -34,7 +38,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
         // Initialize purchase service and check subscription status
         Task {
-            await PurchaseService.shared.checkSubscriptionStatus()
+            await RevenueCatPurchaseService.shared.checkSubscriptionStatus()
         }
 
         return true

@@ -153,7 +153,7 @@ struct HomeView: View {
                 )
             }
             .fullScreenCover(isPresented: $showInsightsPaywall) {
-                PaywallView(
+                PaywallContainerView(
                     trigger: .featureGate("Insights"),
                     onPurchaseSuccess: {
                         showInsights = true

@@ -4,3 +4,8 @@ subscriptionManager.xcodeproj/xcuserdata/
 
 # Local scripts with secrets
 download_logos.sh
+
+# RevenueCat configuration secrets
+subscriptionManager/Configuration/Debug.xcconfig
+subscriptionManager/Configuration/Release.xcconfig
+!subscriptionManager/Configuration/Secrets.xcconfig.template

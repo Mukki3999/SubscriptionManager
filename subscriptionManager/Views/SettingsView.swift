@@ -112,7 +112,7 @@ struct SettingsView: View {
                 Text("Are you sure you want to disconnect your Apple account? You'll need to reconnect to scan App Store purchases.")
             }
             .fullScreenCover(isPresented: $showPaywall) {
-                PaywallView(
+                PaywallContainerView(
                     trigger: .featureGate("Settings Upgrade"),
                     onPurchaseSuccess: {
                         showPaywall = false

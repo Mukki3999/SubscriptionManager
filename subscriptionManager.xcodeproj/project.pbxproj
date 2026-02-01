@@ -10,6 +10,8 @@
 		36F8C7DB2F26FA4500792061 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 36F8C7DA2F26FA4500792061 /* FirebaseAnalytics */; };
 		36F8C7DD2F26FA4500792061 /* FirebaseAnalyticsCore in Frameworks */ = {isa = PBXBuildFile; productRef = 36F8C7DC2F26FA4500792061 /* FirebaseAnalyticsCore */; };
 		36F8C7DF2F26FA4500792061 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 36F8C7DE2F26FA4500792061 /* FirebaseCore */; };
+		36F8C7E12F2A000000000001 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 36F8C7E02F2A000000000001 /* RevenueCat */; };
+		36F8C7E32F2A000000000002 /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = 36F8C7E22F2A000000000002 /* RevenueCatUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,6 +35,8 @@
 		368559972F16259E004C1868 /* subscriptionManager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = subscriptionManager.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		368559A42F1625A1004C1868 /* subscriptionManagerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = subscriptionManagerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		368559AE2F1625A1004C1868 /* subscriptionManagerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = subscriptionManagerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		36F8C7F02F2A000000000010 /* subscriptionManager/Configuration/Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = subscriptionManager/Configuration/Debug.xcconfig; sourceTree = SOURCE_ROOT; };
+		36F8C7F12F2A000000000011 /* subscriptionManager/Configuration/Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = subscriptionManager/Configuration/Release.xcconfig; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -61,6 +65,8 @@
 				36F8C7DB2F26FA4500792061 /* FirebaseAnalytics in Frameworks */,
 				36F8C7DF2F26FA4500792061 /* FirebaseCore in Frameworks */,
 				36F8C7DD2F26FA4500792061 /* FirebaseAnalyticsCore in Frameworks */,
+				36F8C7E12F2A000000000001 /* RevenueCat in Frameworks */,
+				36F8C7E32F2A000000000002 /* RevenueCatUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -88,6 +94,7 @@
 				368559A72F1625A1004C1868 /* subscriptionManagerTests */,
 				368559B12F1625A1004C1868 /* subscriptionManagerUITests */,
 				368559982F16259E004C1868 /* Products */,
+				36E4654C2F2CAB2300FB7282 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -99,6 +106,15 @@
 				368559AE2F1625A1004C1868 /* subscriptionManagerUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		36E4654C2F2CAB2300FB7282 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				36F8C7F02F2A000000000010 /* subscriptionManager/Configuration/Debug.xcconfig */,
+				36F8C7F12F2A000000000011 /* subscriptionManager/Configuration/Release.xcconfig */,
+			);
+			name = "Recovered References";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -124,6 +140,8 @@
 				36F8C7DA2F26FA4500792061 /* FirebaseAnalytics */,
 				36F8C7DC2F26FA4500792061 /* FirebaseAnalyticsCore */,
 				36F8C7DE2F26FA4500792061 /* FirebaseCore */,
+				36F8C7E02F2A000000000001 /* RevenueCat */,
+				36F8C7E22F2A000000000002 /* RevenueCatUI */,
 			);
 			productName = subscriptionManager;
 			productReference = 368559972F16259E004C1868 /* subscriptionManager.app */;
@@ -209,6 +227,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				36F8C7D92F26FA4500792061 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				36F8C7DF2F2A000000000000 /* XCRemoteSwiftPackageReference "purchases-ios" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 368559982F16259E004C1868 /* Products */;
@@ -407,12 +426,13 @@
 		};
 		368559B92F1625A1004C1868 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 36F8C7F02F2A000000000010 /* subscriptionManager/Configuration/Debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = subscriptionManager/subscriptionManager.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = XR95QV2C94;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -437,12 +457,13 @@
 		};
 		368559BA2F1625A1004C1868 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 36F8C7F12F2A000000000011 /* subscriptionManager/Configuration/Release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = subscriptionManager/subscriptionManager.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = XR95QV2C94;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -587,6 +608,14 @@
 				minimumVersion = 12.8.0;
 			};
 		};
+		36F8C7DF2F2A000000000000 /* XCRemoteSwiftPackageReference "purchases-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RevenueCat/purchases-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -604,6 +633,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 36F8C7D92F26FA4500792061 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCore;
+		};
+		36F8C7E02F2A000000000001 /* RevenueCat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 36F8C7DF2F2A000000000000 /* XCRemoteSwiftPackageReference "purchases-ios" */;
+			productName = RevenueCat;
+		};
+		36F8C7E22F2A000000000002 /* RevenueCatUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 36F8C7DF2F2A000000000000 /* XCRemoteSwiftPackageReference "purchases-ios" */;
+			productName = RevenueCatUI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

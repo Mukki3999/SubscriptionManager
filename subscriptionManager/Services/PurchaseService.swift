@@ -10,6 +10,8 @@ import StoreKit
 
 // MARK: - Purchase Error
 
+/// Error types for purchase operations
+/// Note: This enum is shared between PurchaseService and RevenueCatPurchaseService
 enum PurchaseError: LocalizedError {
     case productNotFound
     case purchaseFailed
@@ -39,6 +41,8 @@ enum PurchaseError: LocalizedError {
 // MARK: - Purchase Service
 
 /// Service for handling StoreKit 2 in-app purchases
+/// - Note: This service is deprecated. Use RevenueCatPurchaseService instead for new features.
+@available(*, deprecated, message: "Use RevenueCatPurchaseService instead")
 @MainActor
 final class PurchaseService: ObservableObject {
 

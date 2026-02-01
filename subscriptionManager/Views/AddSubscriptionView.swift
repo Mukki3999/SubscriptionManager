@@ -124,7 +124,7 @@ struct AddSubscriptionView: View {
                 dismiss()
             }
         }) {
-            PaywallView(
+            PaywallContainerView(
                 trigger: .subscriptionLimit,
                 onContinueFree: nil,
                 onPurchaseSuccess: {
@@ -390,7 +390,7 @@ struct SubscriptionDetailEntryView: View {
             .toolbarBackground(backgroundColor, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .fullScreenCover(isPresented: $showReminderPaywall) {
-                PaywallView(trigger: .featureGate("Custom Reminders"))
+                PaywallContainerView(trigger: .featureGate("Custom Reminders"))
             }
             .alert("Price can't be empty", isPresented: $showPriceError) {
                 Button("OK", role: .cancel) {}

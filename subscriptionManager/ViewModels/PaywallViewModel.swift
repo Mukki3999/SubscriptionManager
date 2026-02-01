@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import StoreKit
+import RevenueCat
 import SwiftUI
 
 // MARK: - Paywall Trigger
@@ -70,41 +70,57 @@ final class PaywallViewModel: ObservableObject {
 
     // MARK: - Dependencies
 
-    private let purchaseService = PurchaseService.shared
+    private let purchaseService = RevenueCatPurchaseService.shared
 
     // MARK: - Computed Properties
 
-    var products: [Product] {
-        purchaseService.products
+    /// Current paywall variant for A/B testing
+    var paywallVariant: PaywallVariant {
+        purchaseService.currentPaywallVariant
     }
 
-    var monthlyProduct: Product? {
-        purchaseService.getMonthlyProduct()
+    /// Whether to show RevenueCat's paywall UI
+    var shouldShowRevenueCatPaywall: Bool {
+        purchaseService.shouldShowRevenueCatPaywall
     }
 
-    var annualProduct: Product? {
-        purchaseService.getAnnualProduct()
+    /// Available packages from RevenueCat
+    var packages: [Package] {
+        purchaseService.availablePackages
     }
 
-    var selectedProduct: Product? {
+    var monthlyPackage: Package? {
+        purchaseService.monthlyPackage
+    }
+
+    var annualPackage: Package? {
+        purchaseService.annualPackage
+    }
+
+    var selectedPackage: Package? {
         switch selectedPlan {
         case .monthly:
-            return monthlyProduct
+            return monthlyPackage
         case .annual:
-            return annualProduct
+            return annualPackage
         }
     }
 
     var hasFreeTrial: Bool {
-        selectedProduct?.hasFreeTrial ?? false
+        selectedPackage?.storeProduct.hasFreeTrial ?? false
     }
 
     var freeTrialText: String? {
-        selectedProduct?.freeTrialDuration
+        selectedPackage?.storeProduct.freeTrialDuration
     }
 
     var isLoading: Bool {
         purchaseService.isLoading || isProcessing
+    }
+
+    /// Check if packages are loaded
+    var packagesLoaded: Bool {
+        !packages.isEmpty
     }
 
     // MARK: - Feature List
@@ -125,24 +141,19 @@ final class PaywallViewModel: ObservableObject {
 
     // MARK: - Public Methods
 
-    /// Load products if not already loaded
+    /// Load offerings if not already loaded
     func loadProductsIfNeeded() async {
-        if products.isEmpty {
-            await purchaseService.loadProducts()
+        if packages.isEmpty {
+            await purchaseService.loadOfferings()
         }
-    }
-
-    /// Check if products are loaded
-    var productsLoaded: Bool {
-        !products.isEmpty
     }
 
     /// Purchase the selected plan
     func purchase() async {
-        // Check if products are loaded first
-        guard productsLoaded else {
+        // Check if packages are loaded first
+        guard packagesLoaded else {
             #if DEBUG
-            errorMessage = "StoreKit products not loaded. In Xcode: Edit Scheme > Run > Options > StoreKit Configuration > Select 'Configuration.storekit'"
+            errorMessage = "RevenueCat offerings not loaded. Make sure your API key is configured in Debug.xcconfig"
             #else
             errorMessage = "Unable to load products. Please check your internet connection and try again."
             #endif
@@ -150,7 +161,7 @@ final class PaywallViewModel: ObservableObject {
             return
         }
 
-        guard let product = selectedProduct else {
+        guard let package = selectedPackage else {
             errorMessage = "Please select a plan"
             showError = true
             return
@@ -158,23 +169,23 @@ final class PaywallViewModel: ObservableObject {
 
         isProcessing = true
         errorMessage = nil
-        AnalyticsService.event("paywall_purchase_start", params: purchaseAnalyticsParams(productID: product.id))
+        AnalyticsService.event("paywall_purchase_start", params: purchaseAnalyticsParams(productID: package.storeProduct.productIdentifier))
 
         do {
-            try await purchaseService.purchase(product)
-            AnalyticsService.event("paywall_purchase_success", params: purchaseAnalyticsParams(productID: product.id))
+            try await purchaseService.purchase(package: package)
+            AnalyticsService.event("paywall_purchase_success", params: purchaseAnalyticsParams(productID: package.storeProduct.productIdentifier))
             purchaseSuccessful = true
         } catch let error as PurchaseError {
             if case .purchaseCancelled = error {
                 // User cancelled, don't show error
-                AnalyticsService.event("paywall_purchase_cancelled", params: purchaseAnalyticsParams(productID: product.id))
+                AnalyticsService.event("paywall_purchase_cancelled", params: purchaseAnalyticsParams(productID: package.storeProduct.productIdentifier))
             } else {
-                AnalyticsService.event("paywall_purchase_failed", params: purchaseAnalyticsParams(productID: product.id, error: error.localizedDescription))
+                AnalyticsService.event("paywall_purchase_failed", params: purchaseAnalyticsParams(productID: package.storeProduct.productIdentifier, error: error.localizedDescription))
                 errorMessage = error.localizedDescription
                 showError = true
             }
         } catch {
-            AnalyticsService.event("paywall_purchase_failed", params: purchaseAnalyticsParams(productID: product.id, error: error.localizedDescription))
+            AnalyticsService.event("paywall_purchase_failed", params: purchaseAnalyticsParams(productID: package.storeProduct.productIdentifier, error: error.localizedDescription))
             errorMessage = "Purchase failed. Please try again."
             showError = true
         }
@@ -208,20 +219,36 @@ final class PaywallViewModel: ObservableObject {
         isProcessing = false
     }
 
-    /// Get formatted price for display
-    func formattedPrice(for plan: PremiumProduct) -> String {
+    /// Get formatted price for display (price only, no period suffix)
+    func formattedPrice(for plan: PremiumProduct) -> String? {
         switch plan {
         case .monthly:
-            return monthlyProduct?.formattedPriceWithPeriod ?? plan.formattedPrice
+            return monthlyPackage?.storeProduct.localizedPriceString
         case .annual:
-            return annualProduct?.formattedPriceWithPeriod ?? plan.formattedPrice
+            return annualPackage?.storeProduct.localizedPriceString
         }
     }
 
-    /// Get monthly equivalent for annual plan
-    func monthlyEquivalent(for plan: PremiumProduct) -> String? {
-        guard plan == .annual else { return nil }
-        return annualProduct?.monthlyEquivalent.map { "\($0)/mo" }
+    /// Get period suffix for display (e.g., "/year", "/month")
+    func periodSuffix(for plan: PremiumProduct) -> String {
+        switch plan {
+        case .monthly:
+            return "/month"
+        case .annual:
+            return "/year"
+        }
+    }
+
+    /// Get monthly equivalent for annual plan (annual price / 12, formatted with same locale)
+    func formattedMonthlyEquivalent(for plan: PremiumProduct) -> String? {
+        guard plan == .annual,
+              let annualProduct = annualPackage?.storeProduct else { return nil }
+
+        let monthlyPrice = annualProduct.price / Decimal(12)
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.locale = annualProduct.priceFormatter?.locale ?? .current
+        return formatter.string(from: monthlyPrice as NSDecimalNumber)
     }
 
     // MARK: - Analytics Helpers
@@ -229,7 +256,8 @@ final class PaywallViewModel: ObservableObject {
     private func baseAnalyticsParams() -> [String: Any] {
         var params: [String: Any] = [
             "trigger": trigger.analyticsValue,
-            "selected_plan": selectedPlan.analyticsValue
+            "selected_plan": selectedPlan.analyticsValue,
+            "variant": paywallVariant.analyticsValue
         ]
 
         if let detectedSubscriptionCount {
