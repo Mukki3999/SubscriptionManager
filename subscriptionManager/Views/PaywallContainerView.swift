@@ -22,8 +22,9 @@ struct PaywallContainerView: View {
     let onPurchaseSuccess: (() -> Void)?
 
     @StateObject private var viewModel: PaywallViewModel
-    @StateObject private var purchaseService = RevenueCatPurchaseService.shared
+    @ObservedObject private var purchaseService = RevenueCatPurchaseService.shared
     @Environment(\.dismiss) private var dismiss
+
 
     // MARK: - Initialization
 
@@ -46,24 +47,82 @@ struct PaywallContainerView: View {
     // MARK: - Body
 
     var body: some View {
-        Group {
-            if purchaseService.shouldShowRevenueCatPaywall,
-               let offering = purchaseService.currentOffering {
-                // RevenueCat Paywall (Variant B)
+        paywallForVariant(resolvedVariant)
+            .onAppear {
+                #if DEBUG
+                print("PaywallContainerView: variant=\(purchaseService.currentPaywallVariant?.rawValue ?? "nil"), offering=\(purchaseService.currentOffering?.identifier ?? "nil"), resolved=\(resolvedVariant.rawValue)")
+                #endif
+                trackPaywallView()
+            }
+    }
+
+    /// Resolves which paywall variant to show
+    private var resolvedVariant: PaywallVariant {
+        #if DEBUG
+        // Allow forcing a variant in debug builds for testing
+        if let forced = debugForceVariant {
+            return forced
+        }
+        #endif
+
+        // Use A/B test assignment from RevenueCat
+        if let variant = purchaseService.currentPaywallVariant {
+            return variant
+        }
+
+        // Fallback: determine variant from current offering if available
+        // This handles the case where offerings loaded but variant wasn't set
+        if let offering = purchaseService.currentOffering {
+            if offering.identifier == RevenueCatConfig.OfferingID.customPaywall {
+                return .custom
+            } else {
+                return .revenueCat
+            }
+        }
+
+        // Last resort: offerings not loaded yet, default to custom
+        // Custom paywall handles product loading gracefully with fallback prices
+        return .custom
+    }
+
+    // MARK: - Paywall Selection
+
+    @ViewBuilder
+    private func paywallForVariant(_ variant: PaywallVariant) -> some View {
+        switch variant {
+        case .revenueCat:
+            if let offering = purchaseService.currentOffering {
+                // Use RevenueCat's PaywallView with the current offering
                 revenueCatPaywall(offering: offering)
             } else {
-                // Custom Paywall (Control / Variant A)
+                // Edge case: variant is revenueCat but no offering
+                // Fall back to custom paywall
                 CustomPaywallView(
                     viewModel: viewModel,
                     onContinueFree: onContinueFree,
                     onPurchaseSuccess: onPurchaseSuccess
                 )
             }
-        }
-        .onAppear {
-            trackPaywallView()
+        case .custom:
+            CustomPaywallView(
+                viewModel: viewModel,
+                onContinueFree: onContinueFree,
+                onPurchaseSuccess: onPurchaseSuccess
+            )
         }
     }
+
+    // MARK: - Debug Helper
+    #if DEBUG
+    /// Temporarily force a specific variant for testing
+    /// Set to nil to use A/B test assignment
+    private var debugForceVariant: PaywallVariant? {
+        // Uncomment one of these to force a specific paywall for testing:
+        // return .custom      // Force custom Swift paywall
+        // return .revenueCat  // Force RevenueCat paywall
+        return nil  // Use A/B test assignment
+    }
+    #endif
 
     // MARK: - RevenueCat Paywall
 
@@ -99,7 +158,7 @@ struct PaywallContainerView: View {
     private func analyticsParams(extra: [String: Any] = [:]) -> [String: Any] {
         var params: [String: Any] = [
             "trigger": trigger.analyticsValue,
-            "variant": purchaseService.currentPaywallVariant.analyticsValue
+            "variant": purchaseService.currentPaywallVariant?.analyticsValue ?? "unknown"
         ]
 
         if let detectedSubscriptionCount {

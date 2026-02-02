@@ -74,8 +74,8 @@ final class PaywallViewModel: ObservableObject {
 
     // MARK: - Computed Properties
 
-    /// Current paywall variant for A/B testing
-    var paywallVariant: PaywallVariant {
+    /// Current paywall variant for A/B testing (nil if not yet determined)
+    var paywallVariant: PaywallVariant? {
         purchaseService.currentPaywallVariant
     }
 
@@ -114,8 +114,9 @@ final class PaywallViewModel: ObservableObject {
         selectedPackage?.storeProduct.freeTrialDuration
     }
 
+    /// Only show loading overlay during purchase/restore operations, not product loading
     var isLoading: Bool {
-        purchaseService.isLoading || isProcessing
+        isProcessing
     }
 
     /// Check if packages are loaded
@@ -220,12 +221,21 @@ final class PaywallViewModel: ObservableObject {
     }
 
     /// Get formatted price for display (price only, no period suffix)
+    /// Returns localized price from StoreKit, or fallback price if packages aren't loaded
     func formattedPrice(for plan: PremiumProduct) -> String? {
         switch plan {
         case .monthly:
-            return monthlyPackage?.storeProduct.localizedPriceString
+            if let price = monthlyPackage?.storeProduct.localizedPriceString {
+                return price
+            }
+            // Fallback price (USD) - only used if StoreKit products fail to load
+            return "$4.99"
         case .annual:
-            return annualPackage?.storeProduct.localizedPriceString
+            if let price = annualPackage?.storeProduct.localizedPriceString {
+                return price
+            }
+            // Fallback price (USD) - only used if StoreKit products fail to load
+            return "$39.99"
         }
     }
 
@@ -240,15 +250,20 @@ final class PaywallViewModel: ObservableObject {
     }
 
     /// Get monthly equivalent for annual plan (annual price / 12, formatted with same locale)
+    /// Returns calculated monthly equivalent, or fallback if packages aren't loaded
     func formattedMonthlyEquivalent(for plan: PremiumProduct) -> String? {
-        guard plan == .annual,
-              let annualProduct = annualPackage?.storeProduct else { return nil }
+        guard plan == .annual else { return nil }
 
-        let monthlyPrice = annualProduct.price / Decimal(12)
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.locale = annualProduct.priceFormatter?.locale ?? .current
-        return formatter.string(from: monthlyPrice as NSDecimalNumber)
+        if let annualProduct = annualPackage?.storeProduct {
+            let monthlyPrice = annualProduct.price / Decimal(12)
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .currency
+            formatter.locale = annualProduct.priceFormatter?.locale ?? .current
+            return formatter.string(from: monthlyPrice as NSDecimalNumber)
+        }
+
+        // Fallback monthly equivalent (USD) - $39.99 / 12 ≈ $3.33
+        return "$3.33"
     }
 
     // MARK: - Analytics Helpers
@@ -257,7 +272,7 @@ final class PaywallViewModel: ObservableObject {
         var params: [String: Any] = [
             "trigger": trigger.analyticsValue,
             "selected_plan": selectedPlan.analyticsValue,
-            "variant": paywallVariant.analyticsValue
+            "variant": paywallVariant?.analyticsValue ?? "unknown"
         ]
 
         if let detectedSubscriptionCount {

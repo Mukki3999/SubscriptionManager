@@ -34,11 +34,19 @@ final class RevenueCatPurchaseService: NSObject, ObservableObject {
     @Published private(set) var hasActiveSubscription: Bool = false
     @Published private(set) var subscriptionExpirationDate: Date?
     @Published private(set) var isLoading: Bool = false
-    @Published private(set) var currentPaywallVariant: PaywallVariant = .custom
+
+    /// The determined paywall variant from A/B test. Nil until offerings are loaded.
+    @Published private(set) var currentPaywallVariant: PaywallVariant?
 
     // MARK: - Computed Properties
 
+    /// Whether offerings have been loaded and variant is determined
+    var isReady: Bool {
+        currentOffering != nil && currentPaywallVariant != nil
+    }
+
     /// Whether to show RevenueCat's paywall UI based on A/B test assignment
+    /// Returns false if variant hasn't been determined yet
     var shouldShowRevenueCatPaywall: Bool {
         currentPaywallVariant == .revenueCat
     }
@@ -98,10 +106,15 @@ final class RevenueCatPurchaseService: NSObject, ObservableObject {
 
     /// Load available offerings from RevenueCat
     func loadOfferings() async {
-        guard isConfigured else { return }
+        guard isConfigured else {
+            print("RevenueCatPurchaseService: Not configured, skipping offerings load")
+            return
+        }
+
+        // Prevent duplicate loading
+        guard !isLoading else { return }
 
         isLoading = true
-        defer { isLoading = false }
 
         do {
             let offerings = try await Purchases.shared.offerings()
@@ -111,8 +124,10 @@ final class RevenueCatPurchaseService: NSObject, ObservableObject {
             // Determine A/B variant based on offering identifier
             determinePaywallVariant()
 
+            isLoading = false
             print("RevenueCatPurchaseService: Loaded offerings - current: \(offerings.current?.identifier ?? "none")")
         } catch {
+            isLoading = false
             print("RevenueCatPurchaseService: Failed to load offerings - \(error.localizedDescription)")
         }
     }
@@ -200,21 +215,24 @@ final class RevenueCatPurchaseService: NSObject, ObservableObject {
     /// Determine which paywall variant to show based on offering
     private func determinePaywallVariant() {
         guard let offering = currentOffering else {
+            // No offering available - default to RevenueCat paywall
+            // This handles edge cases where offerings fail to load
             currentPaywallVariant = .revenueCat
+            print("RevenueCatPurchaseService: No offering available, defaulting to RevenueCat paywall")
             return
         }
 
         // RevenueCat Experiments assigns users to different offerings
-        // Check offering identifier to determine variant
-        // Default offering shows RevenueCat paywall (control)
-        // custom_paywall offering shows your custom paywall (variant)
+        // Based on your experiment setup:
+        // - "custom_paywall" offering → show custom Swift paywall (Variant A)
+        // - "default" offering → show RevenueCat paywall (Variant B)
         if offering.identifier == RevenueCatConfig.OfferingID.customPaywall {
             currentPaywallVariant = .custom
         } else {
             currentPaywallVariant = .revenueCat
         }
 
-        print("RevenueCatPurchaseService: Paywall variant = \(currentPaywallVariant.rawValue)")
+        print("RevenueCatPurchaseService: Paywall variant = \(currentPaywallVariant?.rawValue ?? "nil") (offering: \(offering.identifier))")
     }
 
     /// Update subscription status from customer info
