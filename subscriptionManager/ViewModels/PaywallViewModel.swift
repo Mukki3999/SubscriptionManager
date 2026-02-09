@@ -151,15 +151,17 @@ final class PaywallViewModel: ObservableObject {
 
     /// Purchase the selected plan
     func purchase() async {
-        // Check if packages are loaded first
-        guard packagesLoaded else {
-            #if DEBUG
-            errorMessage = "RevenueCat offerings not loaded. Make sure your API key is configured in Debug.xcconfig"
-            #else
-            errorMessage = "Unable to load products. Please check your internet connection and try again."
-            #endif
-            showError = true
-            return
+        // If packages aren't loaded yet, await the in-progress offerings load
+        if !packagesLoaded {
+            isProcessing = true
+            await purchaseService.loadOfferings()
+
+            guard packagesLoaded else {
+                isProcessing = false
+                errorMessage = "Unable to load products. Please check your internet connection and try again."
+                showError = true
+                return
+            }
         }
 
         guard let package = selectedPackage else {

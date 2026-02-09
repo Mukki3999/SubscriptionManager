@@ -26,6 +26,9 @@ struct SettingsView: View {
     @State private var showDisconnectGmailAlert = false
     @State private var showDisconnectAppleAlert = false
     @State private var showPaywall = false
+    @State private var showDeleteAccountAlert = false
+    @State private var isDeleting = false
+    @State private var deletionErrorMessage: String?
 
     // MARK: - Constants
 
@@ -54,6 +57,9 @@ struct SettingsView: View {
 
                         // About Section
                         aboutSection
+
+                        // Delete Account Section
+                        deleteAccountSection
 
                         // App Version
                         appVersionText
@@ -119,6 +125,24 @@ struct SettingsView: View {
                     }
                 )
             }
+            .alert("Delete All Data?", isPresented: $showDeleteAccountAlert) {
+                Button("Cancel", role: .cancel) { }
+                Button("Delete Everything", role: .destructive) {
+                    Task {
+                        await performAccountDeletion()
+                    }
+                }
+            } message: {
+                Text("This will permanently delete:\n\n• All connected accounts\n• Your profile and settings\n• All subscription tracking data\n• Email scan history\n\nYour active subscriptions will remain active but won't be tracked in this app.\n\nThis action cannot be undone.")
+            }
+            .alert("Deletion Failed", isPresented: .constant(deletionErrorMessage != nil)) {
+                Button("OK") {
+                    deletionErrorMessage = nil
+                }
+            } message: {
+                Text(deletionErrorMessage ?? "An error occurred while deleting your data. Please try again.")
+            }
+            .disabled(isDeleting)
         }
     }
 
@@ -438,6 +462,32 @@ struct SettingsView: View {
         }
     }
 
+    // MARK: - Delete Account Section
+
+    private var deleteAccountSection: some View {
+        Button(action: { showDeleteAccountAlert = true }) {
+            HStack {
+                if isDeleting {
+                    ProgressView()
+                        .tint(.red)
+                        .frame(width: 20, height: 20)
+                }
+
+                Text("Delete All Data")
+                    .font(.system(size: 16, weight: .regular))
+                    .foregroundColor(.red)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 14)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color.white.opacity(0.06))
+            )
+        }
+        .buttonStyle(.plain)
+        .disabled(isDeleting)
+    }
+
     // MARK: - App Version
 
     private var appVersionText: some View {
@@ -475,6 +525,31 @@ struct SettingsView: View {
     private func openSubscriptionManagement() {
         if let url = URL(string: "https://apps.apple.com/account/subscriptions") {
             UIApplication.shared.open(url)
+        }
+    }
+
+    /// Performs account deletion
+    private func performAccountDeletion() async {
+        isDeleting = true
+
+        let result = await AccountDeletionService.shared.deleteAllUserData()
+
+        await MainActor.run {
+            isDeleting = false
+
+            switch result {
+            case .success:
+                // Dismiss settings immediately, then show success message
+                dismiss()
+
+                // Small delay to let the sheet dismiss, then show success
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    // The app will automatically reset to onboarding via notification
+                }
+            case .failure(let error):
+                // Show error if deletion fails
+                deletionErrorMessage = error.localizedDescription
+            }
         }
     }
 }
