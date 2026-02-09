@@ -57,14 +57,17 @@ struct InsightsView: View {
                         }
 
                         summarySection
-                    } else {
+                    } else if subscriptions.isEmpty {
+                        // Only show generic empty state when user has no subscriptions at all
                         emptyStateView
                     }
 
-                    // Export button
-                    exportButton
-                        .padding(.top, 8)
-                        .padding(.bottom, 32)
+                    // Export button (hidden when no data for selected month)
+                    if !viewModel.categoryBreakdown.isEmpty {
+                        exportButton
+                            .padding(.top, 8)
+                            .padding(.bottom, 32)
+                    }
                 }
                 .padding(.horizontal, 20)
             }
@@ -87,9 +90,13 @@ struct InsightsView: View {
             AnalyticsService.event("insights_view")
             // Ensure data is current on appear
             viewModel.updateSubscriptions(subscriptions)
+            viewModel.updateSelectedMonth(selectedMonth)
         }
         .onChange(of: subscriptions) { newSubscriptions in
             viewModel.updateSubscriptions(newSubscriptions)
+        }
+        .onChange(of: selectedMonth) { newMonth in
+            viewModel.updateSelectedMonth(newMonth)
         }
     }
 
@@ -103,20 +110,35 @@ struct InsightsView: View {
                 Spacer()
             }
 
-            // Larger donut chart with thicker ring
-            ZStack {
-                LogoDonutChartView(
-                    items: categoryRingItems,
-                    lineWidth: 48,  // 20% thicker
-                    size: 240,      // Larger chart
-                    showLogos: false
-                )
+            if viewModel.categoryBreakdown.isEmpty {
+                // Empty state for months with no tracked subscriptions
+                VStack(spacing: 12) {
+                    Text("$0.00")
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundColor(.white)
 
-                chartCenterLabel
+                    Text("No tracked subscriptions this month")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.white.opacity(0.4))
+                }
+                .frame(height: 200)
+                .frame(maxWidth: .infinity)
+            } else {
+                // Larger donut chart with thicker ring
+                ZStack {
+                    LogoDonutChartView(
+                        items: categoryRingItems,
+                        lineWidth: 48,  // 20% thicker
+                        size: 240,      // Larger chart
+                        showLogos: false
+                    )
+
+                    chartCenterLabel
+                }
+                .frame(maxWidth: .infinity)
+
+                legendGrid
             }
-            .frame(maxWidth: .infinity)
-
-            legendGrid
         }
         .padding(.vertical, 24)
         .padding(.horizontal, 24)
@@ -152,7 +174,7 @@ struct InsightsView: View {
                 Text(selectedMonthLabel)
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundColor(.white)
-                    .frame(minWidth: 70)
+                    .frame(minWidth: 80)
             }
 
             // Next month button (disabled if current month)
@@ -178,7 +200,7 @@ struct InsightsView: View {
 
     private var selectedMonthLabel: String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "MMMM"
+        formatter.dateFormat = "MMM yyyy"
         return formatter.string(from: selectedMonth)
     }
 
@@ -323,8 +345,8 @@ struct InsightsView: View {
 
     private var formattedCurrentDate: String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "d MMMM"
-        return formatter.string(from: Date())
+        formatter.dateFormat = "MMMM yyyy"
+        return formatter.string(from: selectedMonth)
     }
 
     // MARK: - Category Breakdown Section

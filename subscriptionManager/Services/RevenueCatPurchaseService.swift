@@ -69,6 +69,7 @@ final class RevenueCatPurchaseService: NSObject, ObservableObject {
     // MARK: - Private Properties
 
     private var isConfigured = false
+    private var loadOfferingsTask: Task<Void, Never>?
 
     // MARK: - Initialization
 
@@ -88,7 +89,11 @@ final class RevenueCatPurchaseService: NSObject, ObservableObject {
             return
         }
 
+        #if DEBUG
         Purchases.logLevel = .debug
+        #else
+        Purchases.logLevel = .warn
+        #endif
         Purchases.configure(withAPIKey: apiKey)
         Purchases.shared.delegate = self
 
@@ -104,32 +109,36 @@ final class RevenueCatPurchaseService: NSObject, ObservableObject {
 
     // MARK: - Public Methods
 
-    /// Load available offerings from RevenueCat
+    /// Load available offerings from RevenueCat.
+    /// If a load is already in progress, callers await the same task instead of bailing out.
     func loadOfferings() async {
         guard isConfigured else {
             print("RevenueCatPurchaseService: Not configured, skipping offerings load")
             return
         }
 
-        // Prevent duplicate loading
-        guard !isLoading else { return }
-
-        isLoading = true
-
-        do {
-            let offerings = try await Purchases.shared.offerings()
-            self.offerings = offerings
-            self.currentOffering = offerings.current
-
-            // Determine A/B variant based on offering identifier
-            determinePaywallVariant()
-
-            isLoading = false
-            print("RevenueCatPurchaseService: Loaded offerings - current: \(offerings.current?.identifier ?? "none")")
-        } catch {
-            isLoading = false
-            print("RevenueCatPurchaseService: Failed to load offerings - \(error.localizedDescription)")
+        // If already loading, await the in-progress task
+        if let existingTask = loadOfferingsTask {
+            await existingTask.value
+            return
         }
+
+        let task = Task { @MainActor in
+            isLoading = true
+            do {
+                let offerings = try await Purchases.shared.offerings()
+                self.offerings = offerings
+                self.currentOffering = offerings.current
+                determinePaywallVariant()
+                print("RevenueCatPurchaseService: Loaded offerings - current: \(offerings.current?.identifier ?? "none")")
+            } catch {
+                print("RevenueCatPurchaseService: Failed to load offerings - \(error.localizedDescription)")
+            }
+            isLoading = false
+            loadOfferingsTask = nil
+        }
+        loadOfferingsTask = task
+        await task.value
     }
 
     /// Purchase a package

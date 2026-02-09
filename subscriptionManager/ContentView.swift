@@ -31,6 +31,16 @@ struct ContentView: View {
         ))
     }
 
+    // MARK: - Account Deletion Handler
+
+    private func handleAccountDeletion() {
+        withAnimation(.easeInOut(duration: 0.4)) {
+            currentScreen = .onboarding
+            showHome = false
+            inboxManualEntry = false
+        }
+    }
+
     var body: some View {
         ZStack {
             switch currentScreen {
@@ -75,6 +85,9 @@ struct ContentView: View {
             }
         }
         .animation(.easeInOut(duration: 0.3), value: currentScreen)
+        .onReceive(NotificationCenter.default.publisher(for: .accountDeleted)) { _ in
+            handleAccountDeletion()
+        }
     }
 
     // MARK: - Initial Screen Selection

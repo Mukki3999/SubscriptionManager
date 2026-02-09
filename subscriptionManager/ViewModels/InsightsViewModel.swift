@@ -41,6 +41,20 @@ final class InsightsViewModel: ObservableObject {
     // MARK: - Properties
 
     private var subscriptions: [Subscription]
+    private var selectedMonth: Date = Date()
+
+    /// Subscriptions filtered by selectedMonth: only includes subscriptions detected on or before the end of the selected month
+    private var filteredSubscriptions: [Subscription] {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.year, .month], from: selectedMonth)
+        guard let startOfMonth = calendar.date(from: components),
+              let startOfNextMonth = calendar.date(byAdding: .month, value: 1, to: startOfMonth) else {
+            return subscriptions
+        }
+        // End of selected month = one second before start of next month
+        let endOfMonth = startOfNextMonth.addingTimeInterval(-1)
+        return subscriptions.filter { $0.detectedAt <= endOfMonth }
+    }
 
     // MARK: - Initialization
 
@@ -49,11 +63,17 @@ final class InsightsViewModel: ObservableObject {
         calculateBreakdown()
     }
 
-    // MARK: - Update Method
+    // MARK: - Update Methods
 
     /// Update with new subscriptions data
     func updateSubscriptions(_ newSubscriptions: [Subscription]) {
         self.subscriptions = newSubscriptions
+        calculateBreakdown()
+    }
+
+    /// Update the selected month and recalculate
+    func updateSelectedMonth(_ month: Date) {
+        self.selectedMonth = month
         calculateBreakdown()
     }
 
@@ -67,7 +87,7 @@ final class InsightsViewModel: ObservableObject {
     }
 
     var subscriptionCount: Int {
-        subscriptions.count
+        filteredSubscriptions.count
     }
 
     var topCategory: CategorySpending? {
@@ -80,7 +100,7 @@ final class InsightsViewModel: ObservableObject {
     }
 
     var topSubscription: Subscription? {
-        subscriptions.max { monthlyEquivalent(for: $0) < monthlyEquivalent(for: $1) }
+        filteredSubscriptions.max { monthlyEquivalent(for: $0) < monthlyEquivalent(for: $1) }
     }
 
     var topSubscriptionMonthly: Double {
@@ -100,7 +120,7 @@ final class InsightsViewModel: ObservableObject {
 
     /// Next subscription to bill
     var nextBillingSubscription: Subscription? {
-        subscriptions
+        filteredSubscriptions
             .filter { $0.nextBillingDate != nil }
             .min { ($0.nextBillingDate ?? .distantFuture) < ($1.nextBillingDate ?? .distantFuture) }
     }
@@ -115,14 +135,14 @@ final class InsightsViewModel: ObservableObject {
 
     /// All subscriptions sorted by monthly spend (descending)
     var allSubscriptionsSortedBySpend: [Subscription] {
-        subscriptions.sorted { monthlyEquivalent(for: $0) > monthlyEquivalent(for: $1) }
+        filteredSubscriptions.sorted { monthlyEquivalent(for: $0) > monthlyEquivalent(for: $1) }
     }
 
     /// Billing cycle breakdown for display
     var billingCycleBreakdown: [(cycle: BillingCycle, count: Int, total: Double)] {
         var cycleMap: [BillingCycle: [Subscription]] = [:]
 
-        for subscription in subscriptions {
+        for subscription in filteredSubscriptions {
             let cycle = subscription.billingCycle
             if cycleMap[cycle] == nil {
                 cycleMap[cycle] = []
@@ -144,12 +164,12 @@ final class InsightsViewModel: ObservableObject {
 
     // MARK: - Methods
 
-    /// Calculate category breakdown from subscriptions
+    /// Calculate category breakdown from filtered subscriptions
     private func calculateBreakdown() {
-        // Group subscriptions by category
+        // Group filtered subscriptions by category
         var categoryMap: [CompanyCategory: [Subscription]] = [:]
 
-        for subscription in subscriptions {
+        for subscription in filteredSubscriptions {
             let category = lookupCategory(for: subscription)
             if categoryMap[category] == nil {
                 categoryMap[category] = []
