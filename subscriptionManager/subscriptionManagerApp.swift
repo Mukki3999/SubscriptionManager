@@ -21,7 +21,8 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     ) -> Bool {
         FirebaseApp.configure()
 
-        // Configure RevenueCat SDK (before any purchase operations)
+        // Configure RevenueCat SDK (before any purchase operations).
+        // configure() already schedules loadOfferings() + checkSubscriptionStatus() internally.
         RevenueCatPurchaseService.shared.configure()
 
         // Clear stale Keychain data on fresh install
@@ -35,11 +36,6 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
         // Set notification center delegate
         UNUserNotificationCenter.current().delegate = self
-
-        // Initialize purchase service and check subscription status
-        Task {
-            await RevenueCatPurchaseService.shared.checkSubscriptionStatus()
-        }
 
         return true
     }

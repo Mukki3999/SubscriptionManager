@@ -21,8 +21,11 @@ enum RevenueCatConfig {
         #endif
     }
 
-    /// The entitlement identifier for Pro subscription
-    static let entitlementID = "Trackit - Subscription Tracker Pro"
+    /// The entitlement identifier for Pro subscription.
+    /// ⚠️ This string must be copy-pasted directly from the RevenueCat dashboard
+    /// Identifier field using the copy button. Do NOT retype it manually.
+    /// Current value needs to be verified — paste from dashboard copy button to confirm.
+    static let entitlementID = "Trackit -  Subscription Tracker Pro"
 
     /// Offering identifiers for A/B testing
     enum OfferingID {

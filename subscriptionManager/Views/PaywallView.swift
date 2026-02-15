@@ -415,9 +415,10 @@ struct CustomPaywallView: View {
                 .foregroundColor(.black)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 18)
-                .background(accentColor)
+                .background(viewModel.packagesLoaded ? accentColor : accentColor.opacity(0.4))
                 .clipShape(RoundedRectangle(cornerRadius: 14))
         }
+        .disabled(!viewModel.packagesLoaded)
         .padding(.horizontal, 24)
         .buttonStyle(ScaleButtonStyle())
     }

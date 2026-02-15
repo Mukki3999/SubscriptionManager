@@ -151,13 +151,14 @@ final class PaywallViewModel: ObservableObject {
 
     /// Purchase the selected plan
     func purchase() async {
+        isProcessing = true
+        defer { isProcessing = false }
+
         // If packages aren't loaded yet, await the in-progress offerings load
         if !packagesLoaded {
-            isProcessing = true
             await purchaseService.loadOfferings()
 
             guard packagesLoaded else {
-                isProcessing = false
                 errorMessage = "Unable to load products. Please check your internet connection and try again."
                 showError = true
                 return
@@ -170,7 +171,6 @@ final class PaywallViewModel: ObservableObject {
             return
         }
 
-        isProcessing = true
         errorMessage = nil
         AnalyticsService.event("paywall_purchase_start", params: purchaseAnalyticsParams(productID: package.storeProduct.productIdentifier))
 
@@ -192,8 +192,6 @@ final class PaywallViewModel: ObservableObject {
             errorMessage = "Purchase failed. Please try again."
             showError = true
         }
-
-        isProcessing = false
     }
 
     /// Restore previous purchases
@@ -223,21 +221,13 @@ final class PaywallViewModel: ObservableObject {
     }
 
     /// Get formatted price for display (price only, no period suffix)
-    /// Returns localized price from StoreKit, or fallback price if packages aren't loaded
+    /// Returns nil if packages aren't loaded yet — never show fake prices
     func formattedPrice(for plan: PremiumProduct) -> String? {
         switch plan {
         case .monthly:
-            if let price = monthlyPackage?.storeProduct.localizedPriceString {
-                return price
-            }
-            // Fallback price (USD) - only used if StoreKit products fail to load
-            return "$4.99"
+            return monthlyPackage?.storeProduct.localizedPriceString
         case .annual:
-            if let price = annualPackage?.storeProduct.localizedPriceString {
-                return price
-            }
-            // Fallback price (USD) - only used if StoreKit products fail to load
-            return "$39.99"
+            return annualPackage?.storeProduct.localizedPriceString
         }
     }
 
@@ -252,20 +242,16 @@ final class PaywallViewModel: ObservableObject {
     }
 
     /// Get monthly equivalent for annual plan (annual price / 12, formatted with same locale)
-    /// Returns calculated monthly equivalent, or fallback if packages aren't loaded
+    /// Returns nil if packages aren't loaded yet
     func formattedMonthlyEquivalent(for plan: PremiumProduct) -> String? {
-        guard plan == .annual else { return nil }
+        guard plan == .annual,
+              let annualProduct = annualPackage?.storeProduct else { return nil }
 
-        if let annualProduct = annualPackage?.storeProduct {
-            let monthlyPrice = annualProduct.price / Decimal(12)
-            let formatter = NumberFormatter()
-            formatter.numberStyle = .currency
-            formatter.locale = annualProduct.priceFormatter?.locale ?? .current
-            return formatter.string(from: monthlyPrice as NSDecimalNumber)
-        }
-
-        // Fallback monthly equivalent (USD) - $39.99 / 12 ≈ $3.33
-        return "$3.33"
+        let monthlyPrice = annualProduct.price / Decimal(12)
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.locale = annualProduct.priceFormatter?.locale ?? .current
+        return formatter.string(from: monthlyPrice as NSDecimalNumber)
     }
 
     // MARK: - Analytics Helpers
